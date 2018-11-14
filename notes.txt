@@ -1,0 +1,88 @@
+Notes on prediction/incrementality
+
+1. Do we need to make action scripts for each of the actions in the kitchen 
+task we are doing? If so, we should also make more than is necessary, meaning
+we include tasks for other recipes that we are not going to use. Also, we 
+should include in our paper some talk about how these might one day be able to
+be created dynamically (like 1 shot learning I think?).
+
+2. Even though we are testing for efficiency in the task, I think the real 
+benefit is the satisfaction that comes with working with a robot that is as 
+responsive as a human (or close to it), and I think that is worth including and
+possibly testing. At the very least, it would be nice if we could have the
+simulation be able to work with a real human as well as a human in the sim, and
+we have a trial where it is one of us talking to it, just so we can include in
+our conclusions section some subjective details about how natural dialogue and
+task cooperation felt with semantic prediction built in. 
+
+3. It looks like the goal manager already has a mechanism built in to see if 
+certain tasks are possible (Like how we were talking about the robot having 
+broken arms). The robot will record that it needs to be at(x) instead of 
+moveTo(x), and so when action receives that it needs to be at(x), it will look 
+to see if there is an action that will accomplish this, if there isn't one I am
+not sure what the behavior is now, but we could make it interrupt! Then, if we
+are ambitious in the future, we can hit it with some one shot learning to be
+able to do that action.
+
+4. Want to have a deep understanding of how the action scripts are formatted 
+and created so that one day in the future, a ML algorithm can create them only
+having access to a recipe found in some database.
+
+Notes on Goal Manager (aka Action) Documentation
+
+In addition to
+simple action execution, the Goal Manager keeps track of the agents'
+state (using the Belief Component) and verifies that all goals and
+actions are acceptable and that the conditions for their execution
+are met.
+
+In order to run Goal Manager GUI
+	./ant run-goalmanager -Dargs="-editor"
+
+Goals are sometimes called "post-conditions"
+
+Central principle is the execution of goals, not "actions"
+
+Generic post condition to perform a specific action:
+	did(action(actor))
+	did(action(actor,arg0,arg1,...))
+
+	action is the name of the action to execute
+	actor is the name of the agent executing the action
+	arg0, arg1, ... are arguments provided to the action
+
+Generic Post conditions are available for each action in the Action Database
+	and do not have to be explicitely described in an action script
+
+- Do we need to submit a goal to Dialogue to get response and to GM to get the
+	action to perform?
+
+- Point at which we want to stop GM is at APPROVED - execution of goal has been
+	approved, but it is not in progress yet. The SUSPEND action status looks 
+	like what we want to use to stop an action from taking place. 
+
+- Do we want to make action primitives or scripts? What are the benefits of 
+	each?
+
+ Need the following explained:
+	By default, each predicate part of the condition will tentatively be 
+	observed first, and, if not found, inferred in the StateMachine/Belief 
+	Component. It is possible to force the observation of a predicate by adding
+	it to the observable array. In this case, the predicate will only be 
+	observed. If it can't be found, the StateMachine/Belief will not be
+	checked. It is also possible to force a predicate to be only checked in 
+	Belief by adding it to the inferable array.
+
+- Maybe we want to add some notion of how "Goals" or "Effects" are related
+	probabilistically to what the speaker has said, so we can also have a
+	notion of what the desired goal is, because that is honestly what we want
+	at the end of the utterance.
+
+- There is a <cost>: cost of action component to the XML action scripts!
+
+- Maybe we use the conditions that need to be met in order for an action to
+	take place to dynamically set the weights of actions in our table
+
+- Can we build a cross-compiler from Java to XML Action scripts? seems like
+	this could definitely be done
+
