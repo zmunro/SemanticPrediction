@@ -1,0 +1,56 @@
+Actions:
+	Pickup
+	Put down
+	Hand me
+
+Object
+	onion
+	garlic
+	oil
+
+Full Semantic
+	Pickup
+		the
+			garlic
+				in the pantry
+				in front of you
+				in front of me
+				next to you
+				next to me
+			onion
+				in the pantry
+				in front of you
+				in front of me
+				next to you
+				next to me
+			oil
+				in the pantry
+				in front of you
+				in front of me
+				next to you
+				next to me
+		an
+			onion
+				in the pantry
+		a
+			garlic (clove)
+				in the pantry
+	Put-down
+		the
+			garlic
+				in front of you
+				in front of me
+				next to you
+				next to me
+			onion
+				
+			oil
+	Hand-me
+		the
+			garlic
+			onion
+			oil
+		an
+			onion
+		a
+			garlic

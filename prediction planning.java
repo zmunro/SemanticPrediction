@@ -4,6 +4,7 @@ public static final int NUM_ACTIONS = 5;
 class Main {
     public static void main(String[] args) {
         PredictionsManager pm = new PredictionsManager(3, 3);
+        Action pickup = new Action()
     }
 }
 
