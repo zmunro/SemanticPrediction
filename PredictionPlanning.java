@@ -1,17 +1,6 @@
-public static final int NUM_OBJECTS = 5;
-public static final int NUM_ACTIONS = 5;
-
-class PredictionPlanning {
-    public static void main(String[] args) {
-        PredictionsManager pm = new PredictionsManager(3, 3);
-        
-        ObjectMapper mapper = new ObjectMapper();
-		InputStream is = Test.class.getResourceAsStream("/input.json");
-		testObj = mapper.readValue(is, Test.class);
-		System.out.println(testObj.actions[0].name);
-	}
-}
-
+import java.util.*;
+import java.lang.*;
+import java.io.*;
 
 class PredictionsManager {
     // Number of most likely objects/extraItems to keep track of.
@@ -23,23 +12,23 @@ class PredictionsManager {
     private ActionObjectTable aoTable;
     private ExtraItemTable extraItemsTable;
     private PredictionTree myPredictionTree;
-    private float contextWeight;
+    private double contextWeight;
 
     PredictionsManager(int numObjects, int numExtraItems) {
         this.numObjectsTracking = numObjectsTracking;
-        this.numExtraItemsTracking = numExtraItemsTracking
+        this.numExtraItemsTracking = numExtraItemsTracking;
         this.contextWeight = 0.50;
         this.aoTable = new ActionObjectTable();
         this.extraItemsTable = new ExtraItemTable();
         this.myPredictionTree = new PredictionTree(numObjects, numExtraItems);
     }
 
-    public void setContextWeight(float weight) {
+    public void setContextWeight(double weight) {
         this.contextWeight = 0.50;
     }
 
     public FullSemantic getFullSemantic() {
-        return this.myPredictionTree.getFullSemantic();
+        return this.myPredictionTree.getTopSemantic();
     }
 }
 
@@ -54,23 +43,20 @@ class PredictionTree {
         return this.action;
     }
 
-    void addObject(ActionObjectPair aoPair) {
-        this.objects.add(aoPair);
-    }
-
     void haltPredictions() {
-        this.haltPredictions = True;
+        this.haltPredictions = true;
     }
 
-    FullSemantic getFullSemantic() {
-        return this.action.getFullSemantic();
+    // will eventually return an array of most likely semantics
+    FullSemantic getTopSemantic() {
+        return this.action.getTopSemantic();
     }
 
     PredictionTree(int numObjects, int numExtraItems) {
         this.numObjectsTracking = numObjects;
         this.numExtraItemsTracking = numExtraItems;
-        this.haltPredictions = False;
-        this.action = NULL;
+        this.haltPredictions = false;
+        this.action = null;
         this.physicalResponses = new HashMap<FullSemantic, String>();
     }
         
@@ -114,12 +100,12 @@ class ActionObjectTable {
 }
 
 class ExtraItemTable {
-    FullSemantic[] getLikelyExtraItems(String object) {
-        return this.allFullSemantics.get(object).getLikelyExtraItems();
+    FullSemantic getMostLikelySemantic(String object) {
+        return this.allFullSemantics.get(object);
     }
 
     void addSemantic(FullSemantic someSemantic) {
-        this.allFullSemantics.put(someSemantic.getObjectName(), someSemantic);
+        this.allFullSemantics.put(someSemantic.getExtraItemWords(), someSemantic);
     }
 
     FullSemantic getFullSemantic(String someSemantic) {
@@ -137,15 +123,12 @@ class ExtraItemTable {
 }
 
 class Action {
-    ActionObjectPair[] getAllObjects() {
-        return this.objects.values().toArray();
-    }
 
     ActionObjectPair[] getLikelyObjects() {
-        return this.likelyObjects.toArray();
+        return this.likelyObjects.toArray(new ActionObjectPair[0]);
     }
 
-    float getObjectProb(String object) {
+    double getObjectProb(String object) {
         return this.objects.get(object).getProb();
     }
 
@@ -153,13 +136,17 @@ class Action {
         return this.name;
     }
 
-    ActionObjectPair mostLikelyObject() {
+    FullSemantic getTopSemantic() {
+        return this.getTopObject().getTopSemantic();
+    }
+
+    ActionObjectPair getTopObject() {
         int maxProbability = 0;
-        ActionObjectPair mostLikelyObject;
-        for(int i = 0; i < this.likelyObjects.length(), i++) {
-            int prob = this.objects[i].getProb();
+        ActionObjectPair mostLikelyObject = null;
+        for(int i = 0; i < this.likelyObjects.size(); i++) {
+            double prob = this.objects.get(i).getProb();
             if (prob > maxProbability) {
-                mostLikelyObject = this.objects[i];
+                mostLikelyObject = this.objects.get(i);
             }
         }
         return mostLikelyObject;
@@ -178,21 +165,18 @@ class Action {
 }
 
 class ActionObjectPair {
-    FullSemantic[] getAllExtraItems() {
-        return this.allExtraItems.values().toArray();
-    }
 
     FullSemantic[] getLikelyExtraItems() {
-        return this.likelyExtraItems.toArray();
+        return this.likelyExtraItems.toArray(new FullSemantic[0]);
     }
 
-    FullSemantic getMostLikelySemantic() {
+    FullSemantic getTopSemantic() {
         int maxProbability = 0;
-        FullSemantic mostLikelySemantic;
-        for(int i = 0; i < this.likelyExtraItems.length(), i++) {
-            int prob = this.likelyExtraItems[i].getProb();
+        FullSemantic mostLikelySemantic = null;
+        for(int i = 0; i < this.likelyExtraItems.size(); i++) {
+            double prob = this.likelyExtraItems.get(i).getProb();
             if (prob > maxProbability) {
-                mostLikelySemantic = this.likelyExtraItems[i];
+                mostLikelySemantic = this.likelyExtraItems.get(i);
             }
         }
         return mostLikelySemantic;
@@ -206,26 +190,26 @@ class ActionObjectPair {
         return this.object;
     }
 
-    void setDynamicProb(float prob) {
+    void setDynamicProb(double prob) {
         this.dynamicProbability = prob;
     }
     
-    float getProb() {
+    double getProb() {
         return this.staticProbability * (1.0 - this.contextWeight) +
         this.dynamicProbability * this.contextWeight;
     }
 
     ActionObjectPair(
         String action, String object, int numExtraItems,
-        float weight, float static, float dynamic) {
+        double weight, double staticP, double dynamicP) {
 
         this.allExtraItems = new HashMap<String, FullSemantic>();
         this.likelyExtraItems = new ArrayList<FullSemantic>(numExtraItems);
         this.action = action;
         this.object = object;
         this.contextWeight = weight;
-        this.staticProbability = static;
-        this.dynamicProbability = dynamic;
+        this.staticProbability = staticP;
+        this.dynamicProbability = dynamicP;
         this.numExtraItemsTracking = numExtraItems;
     }
 
@@ -233,9 +217,9 @@ class ActionObjectPair {
     private HashMap<String, FullSemantic> allExtraItems;
     private String action;
     private String object;
-    private float contextWeight;
-    private float staticProbability;
-    private float dynamicProbability;
+    private double contextWeight;
+    private double staticProbability;
+    private double dynamicProbability;
     private int numExtraItemsTracking;
 }
 
@@ -244,7 +228,7 @@ class FullSemantic {
         return this.aoPair;
     }
     
-    float getProb() {
+    double getProb() {
         return this.staticProbability * (1.0 - this.contextWeight) +
         this.dynamicProbability * this.contextWeight;
     }
@@ -262,21 +246,32 @@ class FullSemantic {
     }
 
     FullSemantic(
-        ActionObjectPair aoPair, String extraItemWords, float static,
-        float dynamic, float weight) {
+        ActionObjectPair aoPair, String extraItemWords, double staticP,
+        double dynamicP, double weight) {
 
         this.aoPair = aoPair;
         this.extraItemWords = extraItemWords;
         this.contextWeight = weight;
-        this.staticProbability = static;
-        this.dynamicProbability = dynamic;
+        this.staticProbability = staticP;
+        this.dynamicProbability = dynamicP;
     }
 
     private ActionObjectPair aoPair;    
     private String extraItemWords;
-    private float staticProb;
-    private float dynamicProb;
-    private float contextWeight;
+    private double staticProbability;
+    private double dynamicProbability;
+    private double contextWeight;
     private String responseUtterance;
-    private File actionScript;
+    private String actionScript;
+}
+
+class PredictionPlanning {
+    public static void main(String[] args) {
+        PredictionsManager pm = new PredictionsManager(3, 3);
+        
+        // ObjectMapper mapper = new ObjectMapper();
+		// InputStream is = Test.class.getResourceAsStream("/input.json");
+		// testObj = mapper.readValue(is, Test.class);
+		// System.out.println(testObj.actions[0].name);
+	}
 }
