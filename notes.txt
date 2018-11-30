@@ -25,8 +25,7 @@ are ambitious in the future, we can hit it with some one shot learning to be
 able to do that action.
 
 4. Want to have a deep understanding of how the action scripts are formatted 
-and created so that one day in the future, a ML algorithm can create them only
-having access to a recipe found in some database.
+and created so that one day in the future
 
 Notes on Goal Manager (aka Action) Documentation
 

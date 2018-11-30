@@ -4,7 +4,7 @@
         "name": "pick-up",
         "objects": [
           {
-            "name": "onion(D)",
+            "name": "onion",
             "weight": 0.35,
             "ExtraItems": [
               "", "on the counter", "in the pantry", "on the cutting board" 
@@ -12,7 +12,7 @@
             "weights": [0.0, 0.5, 0.1, 0.4]
           },
           {
-            "name": "garlic(D)",
+            "name": "garlic",
             "weight": 0.35,
             "ExtraItems": [
               "", "on the counter", "in the pantry", "on the cutting board" 
@@ -20,24 +20,8 @@
             "weights": [0.0, 0.5, 0.1, 0.4]
           },
           {
-            "name": "oil(D)",
+            "name": "oil",
             "weight": 0.15,
-            "ExtraItems": [
-              "", "on the counter", "in the pantry", "on the cutting board" 
-            ],
-            "weights": [0.0, 0.5, 0.1, 0.4]
-          },
-          {
-            "name": "onion(I)",
-            "weight": 0.1,
-            "ExtraItems": [
-              "", "on the counter", "in the pantry", "on the cutting board" 
-            ],
-            "weights": [0.0, 0.5, 0.1, 0.4]
-          },
-          {
-            "name": "garlic(I)",
-            "weight": 0.05,
             "ExtraItems": [
               "", "on the counter", "in the pantry", "on the cutting board" 
             ],
@@ -49,7 +33,7 @@
         "name": "put-down",
         "objects": [
           {
-            "name": "onion(D)",
+            "name": "onion",
             "weight": 0.35,
             "ExtraItems": [
               "", "on the counter", "in the pantry", "on the cutting board" 
@@ -57,7 +41,7 @@
             "weights": [0.0, 0.5, 0.1, 0.4]
           },
           {
-            "name": "garlic(D)",
+            "name": "garlic",
             "weight": 0.35,
             "ExtraItems": [
               "", "on the counter", "in the pantry", "on the cutting board" 
@@ -65,24 +49,8 @@
             "weights": [0.0, 0.5, 0.1, 0.4]
           },
           {
-            "name": "oil(D)",
+            "name": "oil",
             "weight": 0.15,
-            "ExtraItems": [
-              "", "on the counter", "in the pantry", "on the cutting board" 
-            ],
-            "weights": [0.0, 0.5, 0.1, 0.4]
-          },
-          {
-            "name": "onion(I)",
-            "weight": 0.1,
-            "ExtraItems": [
-              "", "on the counter", "in the pantry", "on the cutting board" 
-            ],
-            "weights": [0.0, 0.5, 0.1, 0.4]
-          },
-          {
-            "name": "garlic(I)",
-            "weight": 0.05,
             "ExtraItems": [
               "", "on the counter", "in the pantry", "on the cutting board" 
             ],
@@ -94,32 +62,20 @@
       "name": "give-me",
       "objects": [
         {
-          "name": "onion(D)",
+          "name": "onion",
           "weight": 0.35,
           "ExtraItems": [""],
           "weights": [1.0]
         },
         {
-          "name": "garlic(D)",
+          "name": "garlic",
           "weight": 0.35,
           "ExtraItems": [""],
           "weights": [1.0]
         },
         {
-          "name": "oil(D)",
+          "name": "oil",
           "weight": 0.15,
-          "ExtraItems": [""],
-          "weights": [1.0]
-        },
-        {
-          "name": "onion(I)",
-          "weight": 0.13,
-          "ExtraItems": [""],
-          "weights": [1.0]
-        },
-        {
-          "name": "garlic(I)",
-          "weight": 0.02,
           "ExtraItems": [""],
           "weights": [1.0]
         }
@@ -130,7 +86,7 @@
       "name": "pour",
       "objects": [
         {
-          "name": "oil(D)",
+          "name": "oil",
           "weight": 0.5,
           "ExtraItems": [
             "", "in the bowl", "in the pot", "in the pan", "in the sink" 
@@ -138,7 +94,7 @@
           "weights": [0.0, 0.1, 0.35, 0.5, 0.05]
         },
         {
-          "name": "water(D)",
+          "name": "water",
           "weight": 0.35,
           "ExtraItems": [
             "", "in the glass", "in the sink", "in the bowl" 

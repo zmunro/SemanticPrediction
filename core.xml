@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+
+<type>
+  <name>entity</name>
+  <subtypes>
+    <type>
+      <name>action</name>
+      <subtypes>
+        <type>
+          <name>script</name>
+          <subtypes>
+            <!--checks if goal can be reached by actor-->
+            <type>
+              <name>checkCapableOf</name>
+              <desc>checks if post condition is capable of being reached by ?actor</desc>
+              <var>
+                <varname>?goal</varname>
+                <vartype>com.fol.Predicate</vartype>
+              </var>
+              <var>
+                <varname>!toAssert</varname>
+                <vartype>com.fol.Term</vartype>
+              </var>
+              <control>if</control>
+                <actspec>actionExists ?goal</actspec>
+              <control>then</control>
+              <opspec>invokeStaticMethod com.util.Util createPredicate "capableOf(?goal)" !toAssert</opspec>
+              <actspec>assertBelief !toAssert</actspec>
+              <control>endif</control>
+            </type>
+
+
+            <!-- mechanism to get action description for script narration using NLG -->
+            <type>
+              <name>getActDesc</name>
+              <desc>get step by step of action description and assert it to belief </desc>
+              <var>
+                <varname>?goalPred</varname>
+                <vartype>com.fol.Predicate</vartype>
+              </var>
+              <var>
+                <varname>!goal</varname>
+                <vartype>com.action.Goal</vartype>
+              </var>
+              <var>
+                <varname>!actionSelector</varname>
+                <vartype>com.action.ActionSelector</vartype>
+              </var>
+              <var>
+                <varname>!parameterizedAction</varname>
+                <vartype>com.action.ParameterizedAction</vartype>
+              </var>
+              <var>
+                <varname>!actionDescription</varname>
+                <vartype>com.fol.Predicate</vartype>
+              </var>
+              <var>
+                <varname>!oldDescription</varname>
+                <vartype>com.fol.Predicate</vartype>
+              </var>
+
+              <var>
+                <varname>!ac</varname>
+                <vartype>com.action.ActionConstraints</vartype>
+              </var>
+              <var>
+                <varname>!sm</varname>
+                <vartype>com.action.StateMachine</vartype>
+              </var>
+              <var>
+                <varname>!actionDBEntry</varname>
+                <vartype>com.action.db.ActionDBEntry</vartype>
+              </var>
+              <var>
+                <varname>!eventSpecs</varname>
+                <vartype>java.util.List</vartype>
+              </var>
+              <var>
+                <varname>!stepPredicates</varname>
+                <vartype>java.util.List</vartype>
+              </var>
+              <var>
+                <varname>!tmpPred</varname>
+                <vartype>com.fol.Predicate</vartype>
+              </var>
+              <var>
+                <varname>!tmpVar</varname>
+                <vartype>com.fol.Variable</vartype>
+              </var>
+              <var>
+                <varname>!actDescArgs</varname>
+                <vartype>java.util.List</vartype>
+              </var>
+              <var>
+                <varname>!oldDescArgs</varname>
+                <vartype>java.util.List</vartype>
+              </var>
+
+              <opspec> log debug "start get action description" </opspec>
+
+              <!--init objects needed to do action selection for the goal-->
+              <opspec> newObject com.action.Goal ?goalPred !goal</opspec>
+              <opspec> newObject com.action.ActionConstraints !ac</opspec>
+              <!--TODO: EAK: this creates a new belief component under the covers. we probably don't want that to happen-->
+              <opspec> newObject com.action.StateMachine !sm</opspec>
+
+              <!--pick action, and get event specs from selected action-->
+              <opspec> invokeStaticMethod com.action.ActionSelector getInstance !actionSelector</opspec>
+              <opspec> invokeMethod !actionSelector selectActionForGoal !goal !ac !sm !parameterizedAction</opspec>
+              <opspec> invokeMethod !parameterizedAction getStepsInPredicateForm !stepPredicates</opspec>
+
+              <!--construct final predicate to assert to belief-->
+              <opspec> newObject java.util.ArrayList !actDescArgs</opspec>
+              <opspec> newObject java.util.ArrayList !oldDescArgs</opspec>
+
+              <!--construct and retract a generic predicate from belief to clear previous entries-->
+              <opspec>newObject com.fol.Variable "X" !tmpVar</opspec>
+              <opspec> invokeMethodNoReturn !oldDescArgs add ?goalPred</opspec>
+              <opspec> invokeMethodNoReturn !oldDescArgs add !tmpVar</opspec>
+              <opspec>newObject com.fol.Predicate "actionDescription" !oldDescArgs !oldDescription</opspec>
+              <actspec> retractBelief !oldDescription</actspec>
+
+              <opspec> invokeMethodNoReturn !actDescArgs add ?goalPred</opspec>
+              <opspec>newObject com.fol.Predicate "steps" !stepPredicates !tmpPred</opspec>
+              <opspec> invokeMethodNoReturn !actDescArgs add !tmpPred</opspec>
+              <opspec>newObject com.fol.Predicate "actionDescription" !actDescArgs !actionDescription</opspec>
+
+              <!--assert final predicate to belief-->
+              <actspec> assertBelief !actionDescription</actspec>
+
+              <opspec> log debug "end get action description" </opspec>
+            </type>
+
+            <!-- Forget mechanism -->
+            <type>
+              <name>forgetThat</name>
+              <var>
+                <varname>?predicate</varname>
+                <vartype>com.fol.Predicate</vartype>
+              </var>
+              <var>
+                <varname>!tempVar</varname>
+                <vartype>com.fol.Variable</vartype>
+              </var>
+              <opspec>newObject com.fol.Variable "X" !tempVar</opspec>
+              <opspec>invokeMethodNoReturn ?predicate set 1 !tempVar </opspec>
+              <opspec>log debug "forgetting ?predicate"</opspec>
+              <actspec>retractBelief ?predicate</actspec>
+            </type>
+
+
+            <type>
+              <name>forgetHow</name>
+              <var>
+                <varname>?predicate</varname>
+                <vartype>com.fol.Predicate</vartype>
+              </var>
+              <opspec>log debug "forgetting ?predicate"</opspec>
+              <actspec>removeActionsByPostCondition ?predicate</actspec>
+            </type>
+
+
+            <!-- Tell mechanism -->
+            <type>
+              <name>tell</name>
+              <var>
+                <varname>?goal</varname>
+                <vartype>com.fol.Predicate</vartype>
+              </var>
+
+              <var>
+                <varname>!goalID</varname>
+                <vartype>long</vartype>
+              </var>
+              <var>
+                <varname>!goalStatus</varname>
+                <vartype>com.action.ActionStatus</vartype>
+              </var>
+              <var>
+                <varname>!failConds</varname>
+                <vartype>java.util.List</vartype>
+              </var>
+
+              <actspec>submitGoal ?goal !goalID</actspec>
+              <control>while</control>
+              <control> not</control>
+              <actspec>   goalTerminated !goalID</actspec>
+              <control> endnot</control>
+              <control>do</control>
+              <opspec>  sleep 250</opspec>
+              <control>endwhile</control>
+
+              <actspec>goalStatus !goalID !goalStatus</actspec>
+              <actspec>goalFailConds !goalID !failConds</actspec>
+              <control>exit !goalStatus !failConds</control>
+            </type>
+
+          </subtypes>
+        </type>
+      </subtypes>
+    </type>
+  </subtypes>
+</type>
+
+
