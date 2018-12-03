@@ -18,7 +18,7 @@ class ActionObjectPair {
 
 class ActionObjectTable {
     
-    //<actionName, map of aoPairs>
+    //<actionName, map of aoPairs to probabilities>
     HashMap<String, HashMap> aoTable;
 
     double getProb (String actionName, String objectName) {
@@ -51,7 +51,7 @@ class ActionObjectTable {
 }
 
 class ExtraItemTable {
-    
+    //<aoPair, map of ExtraItem strings to probabilities>
     HashMap<ActionObjectPair, HashMap> eiTable;
 
     double getProb (ActionObjectPair aoPair, String extraItem) {
