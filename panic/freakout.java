@@ -95,9 +95,6 @@ class SortByProbAO implements Comparator<ObjectLevel> {
     }
 }
 
-
-
-
 class ExtraItemLevel {
     double probability;
     String extraItem;
@@ -113,13 +110,17 @@ class ExtraItemLevel {
 }
 
 class ObjectLevel {
-    PriorityQueue<ExtraItemLevel> maxes = new 
-            PriorityQueue<ExtraItemLevel>(new SortByProbEI());
+    ExtraItemLevel[] extraItems; // always sorted
     String objectName;
+
     double probability;
 
     ExtraItemLevel topExtraItem() {
         return this.extraItems.get(0);
+    }
+
+    void generatePredictions(ExtraItemTable eiTable, int numGetting) {
+        this.extraItems = eiTable.getTopExtraItems(numGetting);
     }
 
     ObjectLevel(String object, double prob) {
@@ -130,12 +131,20 @@ class ObjectLevel {
 }
 
 class ActionLevel {
-    PriorityQueue<ObjectLevel> objects = new 
-            PriorityQueue<ObjectLevel>(new SortByProbAO());
+
+    ObjectLevel[] objects; // always sorted
     String actionName;
     
     ObjectLevel topObject() {
         return objects.get(0);
+    }
+
+    void generatePredictions( 
+        ActionObjectTable aoTable, ExtraItemTable eiTable, int numGetting) {  
+        this.objects = aoTable.getTopObjects(numGetting);
+        for(int i = 0; i < ObjectLevel.size(); i++) {
+            objects[i].generatePredictions(eiTable, numGetting);
+        }
     }
 }
 
@@ -154,17 +163,24 @@ class FullSemantic {
 
 
 class PredictionTree {
+    ActionObjectTable aoTable;
+    ExtraItemTable eiTable;
+
     ActionLevel action;
 
+    void generatePredictions(int numGetting) {
+        this.action.generatePredictions(
+            this.aoTable, this.eiTable, numGetting);
+    }
+
     String getFullSemantic() {
-        FullSemantic fs = new FullSemantic();
+        FullSemantic fs = new FullSemantic(this.action);
     }
 }
 
 class PredictionPlanning {
 
     public static void main(String[] args) {
-        HashMap<String, Double> pickupMap = new HashMap<String, Double>();
-        
+        HashMap<String, Double> pickupMap = new HashMap<String, Double>();   
 	}
 }
