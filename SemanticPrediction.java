@@ -159,12 +159,19 @@ class FullSemantic {
         this.object = action.topObject();
         this.extraItem = this.object.topExtraItem();
     }
+
+    FullSemantic(ActionLevel action, ObjectLevel object) {
+        this.action = action;
+        this.object = object;
+        this.extraItem = object.topExtraItem();
+    }
 }
 
 
 class PredictionTree {
     ActionObjectTable aoTable;
     ExtraItemTable eiTable;
+    ObjectLevel correctObject;
 
     ActionLevel action;
 
@@ -173,14 +180,25 @@ class PredictionTree {
             this.aoTable, this.eiTable, numGetting);
     }
 
-    String getFullSemantic() {
-        FullSemantic fs = new FullSemantic(this.action);
+    FullSemantic getFullSemantic() {
+        if (correctObject ===  null) {
+            FullSemantic fs = new FullSemantic(this.action);
+        } else {
+            FullSemantic fs = new 
+                FullSemantic(this.action, this.correctObject);
+        }
+        return fs;
+    }
+
+    PrecictionTree() {
+        this.correctObject = null;
     }
 }
 
 class PredictionPlanning {
 
     public static void main(String[] args) {
-        HashMap<String, Double> pickupMap = new HashMap<String, Double>();   
+        HashMap<String, Double> pickupMap = new HashMap<String, Double>();
+        
 	}
 }
