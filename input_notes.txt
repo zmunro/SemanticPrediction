@@ -1,0 +1,139 @@
+pickup:
+	onion , 0.2:
+		on the counter, 0.2
+
+
+
+actions
+	pick-up
+	hand-me
+	put-down
+	set
+	chop
+	wash
+	turn-on
+	turn-off
+
+objects
+	ginger
+	oil
+	soy sauce
+	celery
+	garlic
+	broccoli
+	pepper
+	salt
+	green beans
+	carrot
+	onion
+	noodles
+	timer
+	pot
+	stove
+
+extraItems
+	on the counter
+	in the fridge
+	in the sink
+	in the pantry
+	on the stove
+	in front of you
+	in front of me
+	next to you
+	next to me
+	for 10 minutes
+	""
+
+
+
+Pick-up:
+	noodles:
+		in the pantry:
+ 	water:
+ 		in the sink:
+ 	pot:
+ 		in front of me
+ 		on the stove
+ 	soy sauce:
+ 		in the pantry
+ 	oil:
+ 		in the pantry
+ 	carrot:
+ 		in the fridge
+ 	broccoli:
+ 		in the fridge
+ 	celery:
+ 		in the fridge
+ 	green beans:
+ 		in the fridge
+ 	ginger:
+ 		in the pantry
+ 	garlic:
+ 		in the pantry
+ 	pepper:
+ 		in the fridge
+
+Hand-me:
+	noodles:
+		""
+	water:
+		""
+	soy sauce:
+		""
+	oil:
+		""
+	garlic:
+		""
+	pot:
+		""
+
+Put-down:
+	pot: 
+		on the stove
+	pepper:
+		on the counter
+	carrot:
+		on the counter
+	broccoli:
+		on the counter
+	celery:
+		on the counter
+	green beans:
+		on the counter
+	ginger:
+		on the counter
+
+
+Turn-on:
+	stove:
+		""
+
+Turn-off:
+	stove:
+		""
+
+Set:
+	timer:
+		for 10 minutes
+
+Wash:
+	carrot:
+		""
+	broccoli:
+		""
+	celery:
+		""
+	green beans:
+		""
+
+Chop:
+	ginger:
+		""
+	pepper:
+		""
+	broccoli:
+		""
+	carrot:
+		""
+	celery:
+		""

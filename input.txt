@@ -1,139 +1,90 @@
-pickup:
-	onion , 0.2:
-		on the counter, 0.2
-
-
-
-actions
-	pick-up
-	hand-me
-	put-down
-	set
-	chop
-	wash
-	turn-on
-	turn-off
-
-objects
-	ginger
-	oil
-	soy sauce
-	celery
-	garlic
-	broccoli
-	pepper
-	salt
-	green beans
-	carrot
-	onion
-	noodles
-	timer
-	pot
-	stove
-
-extraItems
-	on the counter
-	in the fridge
-	in the sink
-	in the pantry
-	on the stove
-	in front of you
-	in front of me
-	next to you
-	next to me
-	for 10 minutes
-	""
-
-
-
 Pick-up:
-	noodles:
-		in the pantry:
- 	water:
- 		in the sink:
- 	pot:
- 		in front of me
- 		on the stove
- 	soy sauce:
- 		in the pantry
- 	oil:
- 		in the pantry
- 	carrot:
- 		in the fridge
- 	broccoli:
- 		in the fridge
- 	celery:
- 		in the fridge
- 	green beans:
- 		in the fridge
- 	ginger:
- 		in the pantry
- 	garlic:
- 		in the pantry
- 	pepper:
- 		in the fridge
-
+	noodles,0.07;
+		in the pantry,1.0
+ 	water,0.1;
+ 		in the sink,1.0
+ 	pot,0.1;
+ 		in front of me,0.5
+ 		on the stove,0.5
+ 	soy sauce,0.05;
+ 		in the pantry,1.0
+ 	oil,0.05;
+ 		in the pantry,1.0
+ 	carrot,0.09;
+ 		in the fridge,1.0
+ 	broccoli,0.09;
+ 		in the fridge,1.0
+ 	celery,0.09;
+ 		in the fridge,1.0
+ 	green beans,0.09;
+ 		in the fridge,1.0
+ 	ginger,0.05;
+ 		in the pantry,1.0
+ 	garlic,0.12;
+ 		in the pantry,1.0
+ 	pepper,0.1;
+ 		in the fridge,1.0
+--
 Hand-me:
-	noodles:
-		""
-	water:
-		""
-	soy sauce:
-		""
-	oil:
-		""
-	garlic:
-		""
-	pot:
-		""
-
+	noodles,0.17;
+		~,1.0
+	water,0.20;
+		~,1.0
+	soy sauce,0.07;
+		~,1.0
+	oil,0.11;
+		~,1.0
+	garlic,0.15;
+		~,1.0
+	pot,0.30;
+		~,1.0
+--
 Put-down:
-	pot: 
-		on the stove
-	pepper:
-		on the counter
-	carrot:
-		on the counter
-	broccoli:
-		on the counter
-	celery:
-		on the counter
-	green beans:
-		on the counter
-	ginger:
-		on the counter
-
-
+	pot,0.2;
+		on the stove,1.0
+	pepper,0.10;
+		on the counter,1.0
+	carrot,0.15;
+		on the counter,1.0
+	broccoli,0.15;
+		on the counter,1.0
+	celery,0.15;
+		on the counter,1.0
+	green beans,0.15;
+		on the counter,1.0
+	ginger,0.10;
+		on the counter,1.0
+--
 Turn-on:
-	stove:
-		""
-
+	stove,1.0;
+		~,1.0
+--
 Turn-off:
-	stove:
-		""
-
+	stove,1.0;
+		~,1.0
+--
 Set:
-	timer:
-		for 10 minutes
-
+	timer,1.0;
+		for 10 minutes,1.0
+--
 Wash:
-	carrot:
-		""
-	broccoli:
-		""
-	celery:
-		""
-	green beans:
-		""
-
+	carrot,0.25;
+		~,1.0
+	broccoli,0.25;
+		~,1.0
+	celery,0.25;
+		~,1.0
+	green beans,0.25;
+		~,1.0
+--
 Chop:
-	ginger:
-		""
-	pepper:
-		""
-	broccoli:
-		""
-	carrot:
-		""
-	celery:
-		""
+	ginger,0.12;
+		~,1.0
+	pepper,0.22;
+		~,1.0
+	broccoli,0.22;
+		~,1.0
+	carrot,0.22;
+		~,1.0
+	celery,0.22;
+		~,1.0

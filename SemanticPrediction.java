@@ -14,6 +14,11 @@ class ProbTuple{
 class ActionObjectPair {
     String action;
     String object;
+
+    ActionObjectPair(String action, String object) {
+    	this.action = action;
+    	this.object = object;
+    }
 }
 
 class ActionObjectTable {
@@ -198,7 +203,43 @@ class PredictionTree {
 class PredictionPlanning {
 
     public static void main(String[] args) {
-        HashMap<String, Double> pickupMap = new HashMap<String, Double>();
+    	File file = new File("C:\\Users\\user\\Documents\\HRI\\prediction\\input.txt"); 
+  
+		BufferedReader br = new BufferedReader(new FileReader(file)); 
+
+		HashMap<String, HashMap> aoTable = new HashMap<String, HashMap>();
+		HashMap<String, Double> obectProbMap = new HashMap<String, Double>();
+		HashMap<String, HashMap> eiTable = new HashMap<String, HashMap>();
+		HashMap<String, Double> extraItemProbMap = new HashMap<String, Double>();
+
+		String st; 
+		String currentAction = null;
+		String currentObject = null;
+
+		while ((st = br.readLine()) != null) {
+			lastChar = st.charAt(st.length() - 1);
+			if(lastChar == ":") {
+				// is an action
+				String action = st.split(":")[0];
+				if (currentAction != action && currentAction != null) {
+					aoTable.add(currentAction, objectProbMap);
+					objectProbMap = new objectProbMap<String, Double>();
+				}
+				currentAction = action;
+			} else if  (lastChar == ";") {
+				// is an object
+				String object = st.split(",")[0];
+				currentObject = object;
+				Double prob = Double.valueOf(st.substring(st.length() - 1).split(",")[1]);
+				objectProbMap.add(object, prob);
+			} else {
+				// is an extra item
+				String extraItem = st.split(",")[0];
+				Double prob = Double.valueOf(st.split(",")[1]);
+				extraItemProbMap.add(extraItem, prob);
+			}
+
+		} 
         
 	}
 }
