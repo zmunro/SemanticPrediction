@@ -1,5 +1,6 @@
 import java.util.*;
 import java.lang.*;
+import java.awt.Desktop.Action;
 import java.io.*;
 
 class ProbTuple{
@@ -53,6 +54,10 @@ class ActionObjectTable {
         }
         return new ArrayList(Arrays.asList(maxes.toArray(new ObjectLevel[numGetting])));
     }
+
+    ActionObjectTable(HashMap<String, HashMap<String, ProbTuple>> aoTable) {
+        this.aoTable = aoTable;
+    }
 }
 
 class ExtraItemTable {
@@ -86,6 +91,10 @@ class ExtraItemTable {
             it.remove(); // avoids a ConcurrentModificationException
         }
         return new ArrayList(Arrays.asList(maxes.toArray(new ExtraItemLevel[numGetting])));
+    }
+
+    ExtraItemTable(HashMap<String, HashMap<String, ProbTuple>> eiTable) {
+        this.eiTable = eiTable;
     }
 }
 
@@ -151,6 +160,10 @@ class ActionLevel {
         for(int i = 0; i < this.objects.size(); i++) {
             objects.get(i).generatePredictions(eiTable, numGetting);
         }
+    }
+    
+    ActionLevel(String action) {
+        this.actionName = action;
     }
 }
 
@@ -231,7 +244,7 @@ class SemanticPrediction {
             if( st.charAt(0) == '-') {
                 st = sc.nextLine().replaceAll("\\s+","");
             } else if (st.charAt(0) == '!') {
-                System.out.println("found end");
+                // System.out.println("found end");
                 aoTable.put(currentAction, objectProbMap);
                 objectProbMap = new HashMap<String, ProbTuple>();
                 eiTable.put(currentObject, extraItemProbMap);
@@ -242,7 +255,7 @@ class SemanticPrediction {
 			if(lastChar == ':') {
                 // is an action
                 String action = st.split(":")[0];
-                System.out.println("action: " + action);
+                // System.out.println("action: " + action);
 				if (currentAction != null) {
 					aoTable.put(currentAction, objectProbMap);
 					objectProbMap = new HashMap<String, ProbTuple>();
@@ -251,7 +264,7 @@ class SemanticPrediction {
 			} else if  (lastChar == ';') {
 				// is an object
                 String object = st.split(",")[0];
-                System.out.println("    object: " + object);
+                // System.out.println("    object: " + object);
                 if (currentObject != null) {
                     eiTable.put(currentObject, extraItemProbMap);
                     extraItemProbMap = new HashMap<String, ProbTuple>();
@@ -263,18 +276,32 @@ class SemanticPrediction {
 			} else {
 				// is an extra item
                 String extraItem = st.split(",")[0];
-                System.out.println("        ei: " + extraItem);
+                // System.out.println("        ei: " + extraItem);
                 Double prob = Double.valueOf(st.split(",")[1]);
                 ProbTuple probability = new ProbTuple(prob, 0);
 				extraItemProbMap.put(extraItem, probability);
 			}
-
         } 
-
-        HashMap<String, ProbTuple> map = aoTable.get("Chop");
-        System.out.println(map.get("ginger").weight());
-
         
+        ActionObjectTable actionObjTable = new ActionObjectTable(aoTable);
+        ExtraItemTable extraItemTable = new ExtraItemTable(eiTable);
+
+        System.out.println(actionObjTable.getProb("Chop", "ginger"));
+
+        PredictionTree pt = new PredictionTree();
+        Scanner scanner = new Scanner(System.in);
+        pt.aoTable = actionObjTable;
+        pt.eiTable = extraItemTable;
+        System.out.println("enter action");
+        String actionName = scanner.nextLine();
+        ActionLevel newAction = new ActionLevel(actionName);
+        pt.action = newAction;
+        pt.generatePredictions(3);
+        FullSemantic fs = pt.getFullSemantic();
+        System.out.print(fs.action.actionName + " ");
+        System.out.print(fs.object.objectName + " ");
+        System.out.println(fs.extraItem.extraItem);
+
         // String line = "start";
         // Scanner scanner = new Scanner(System.in);
         // while(line != "end") {
