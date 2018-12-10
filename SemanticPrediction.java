@@ -217,9 +217,9 @@ class SemanticPrediction {
             System.out.println(ex);
         }
 
-		HashMap<String, HashMap> aoTable = new HashMap<>();
+		HashMap<String, HashMap<String, ProbTuple>> aoTable = new HashMap<>();
 		HashMap<String, ProbTuple> objectProbMap = new HashMap<>();
-		HashMap<String, HashMap> eiTable = new HashMap<>();
+		HashMap<String, HashMap<String, ProbTuple>> eiTable = new HashMap<>();
 		HashMap<String, ProbTuple> extraItemProbMap = new HashMap<>();
 
 		String st; 
@@ -227,25 +227,34 @@ class SemanticPrediction {
 		String currentObject = null;
 
 		while (sc.hasNextLine()) {
-            st = sc.nextLine();
+            st = sc.nextLine().replaceAll("\\s+","");
             if( st.charAt(0) == '-') {
-                st = sc.nextLine();
+                st = sc.nextLine().replaceAll("\\s+","");
+            } else if (st.charAt(0) == '!') {
+                System.out.println("found end");
+                aoTable.put(currentAction, objectProbMap);
+                objectProbMap = new HashMap<String, ProbTuple>();
+                eiTable.put(currentObject, extraItemProbMap);
+                extraItemProbMap = new HashMap<String, ProbTuple>();
+                break;
             }
 			char lastChar = st.charAt(st.length() - 1);
 			if(lastChar == ':') {
                 // is an action
                 String action = st.split(":")[0];
+                System.out.println("action: " + action);
 				if (currentAction != null) {
 					aoTable.put(currentAction, objectProbMap);
-					objectProbMap = new HashMap<>();
+					objectProbMap = new HashMap<String, ProbTuple>();
                 }
 				currentAction = action;
 			} else if  (lastChar == ';') {
 				// is an object
                 String object = st.split(",")[0];
+                System.out.println("    object: " + object);
                 if (currentObject != null) {
                     eiTable.put(currentObject, extraItemProbMap);
-                    extraItemProbMap = new HashMap<>();
+                    extraItemProbMap = new HashMap<String, ProbTuple>();
                 }
                 currentObject = object;
                 Double prob = Double.valueOf(st.substring(0,st.length() - 1).split(",")[1]);
@@ -254,12 +263,28 @@ class SemanticPrediction {
 			} else {
 				// is an extra item
                 String extraItem = st.split(",")[0];
+                System.out.println("        ei: " + extraItem);
                 Double prob = Double.valueOf(st.split(",")[1]);
                 ProbTuple probability = new ProbTuple(prob, 0);
 				extraItemProbMap.put(extraItem, probability);
 			}
 
-		} 
+        } 
+
+        HashMap<String, ProbTuple> map = aoTable.get("Chop");
+        System.out.println(map.get("ginger").weight());
+
         
+        // String line = "start";
+        // Scanner scanner = new Scanner(System.in);
+        // while(line != "end") {
+        //     System.out.println("enter action");
+        //     line = scanner.nextLine();
+        //     String action = line;
+        //     System.out.println("enter object");
+        //     String object = scanner.nextLine();
+        //     ProbTuple prob = aoTable.get(action).get(object);
+        //     System.out.println(prob.weight());
+        // }
 	}
 }
