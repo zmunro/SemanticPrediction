@@ -228,6 +228,9 @@ class SemanticPrediction {
 
 		while (sc.hasNextLine()) {
             st = sc.nextLine();
+            if( st.charAt(0) == '-') {
+                st = sc.nextLine();
+            }
 			char lastChar = st.charAt(st.length() - 1);
 			if(lastChar == ':') {
                 // is an action
@@ -244,13 +247,13 @@ class SemanticPrediction {
                     eiTable.put(currentObject, extraItemProbMap);
                     extraItemProbMap = new HashMap<>();
                 }
-				currentObject = object;
-                Double prob = Double.valueOf(st.substring(st.length() - 1).split(",")[1]);
+                currentObject = object;
+                Double prob = Double.valueOf(st.substring(0,st.length() - 1).split(",")[1]);
                 ProbTuple probability = new ProbTuple(prob, 0);
 				objectProbMap.put(object, probability);
 			} else {
 				// is an extra item
-				String extraItem = st.split(",")[0];
+                String extraItem = st.split(",")[0];
                 Double prob = Double.valueOf(st.split(",")[1]);
                 ProbTuple probability = new ProbTuple(prob, 0);
 				extraItemProbMap.put(extraItem, probability);
