@@ -7,7 +7,7 @@ class ProbTuple{
     double dynamicProb;
 
     Double weight() {
-        if(dynamicProb == 0) {
+        if(dynamicProb == 0.0) {
             return staticProb;
         }
         return (this.staticProb + this.dynamicProb) / 2.0;
@@ -29,72 +29,75 @@ class ActionObjectTable {
         return probs.weight();
     }
 
-    ObjectLevel[] getTopObjects(int numGetting, String actionName) {
+    ArrayList<ObjectLevel> getTopObjects(int numGetting, String actionName) {
         PriorityQueue<ObjectLevel> maxes = new 
             PriorityQueue<ObjectLevel>(new SortByProbAO());
         Iterator it = aoTable.get(actionName).entrySet().iterator();
 
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
+            ProbTuple val = aoTable.get(actionName).get(pair.getKey());
             ObjectLevel objlev = new ObjectLevel(
                 pair.getKey().toString(),
-                pair.getValue()
+                val
             );
+
             
             if (maxes.size() < numGetting) {
                 maxes.add(objlev);
-            } else if (pair.getValue() > maxes.get(0).probability) {
+            } else if (val.weight() > maxes.peek().probability.weight()) {
                 maxes.poll();
                 maxes.add(objlev);
             }
             it.remove(); // avoids a ConcurrentModificationException
         }
-        return maxes.toArray(new ObjectLevel[numGetting]);
+        return new ArrayList(Arrays.asList(maxes.toArray(new ObjectLevel[numGetting])));
     }
 }
 
 class ExtraItemTable {
     //<aoPair, map of ExtraItem strings to probabilities>
-    HashMap<String, HashMap> eiTable;
+    HashMap<String, HashMap<String, ProbTuple>> eiTable;
 
     double getProb (String object, String extraItem) {
-        HashMap map = this.eiTable.get(aoPair);
+        HashMap<String, ProbTuple> map = this.eiTable.get(object);
         ProbTuple probs = map.get(extraItem);
         return probs.weight();
     }
 
-    ExtraItemLevel[] getTopExtraItems(int numGetting, String object) {
+    ArrayList<ExtraItemLevel> getTopExtraItems(int numGetting, String object) {
         PriorityQueue<ExtraItemLevel> maxes = new 
             PriorityQueue<ExtraItemLevel>(new SortByProbEI());
         Iterator it = eiTable.get(object).entrySet().iterator();
 
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
+            ProbTuple val = eiTable.get(object).get(pair.getKey());
             ExtraItemLevel eil = new ExtraItemLevel(
-                pair.getKey(),
-                pair.getValue()
+                (String)pair.getKey(),
+                val
             );
             if (maxes.size() < numGetting) {
                 maxes.add(eil);
-            } else if (pair.getValue() > maxes.get(0).probability) {
+            } else if (val.weight() > maxes.peek().probability.weight()) {
                 maxes.poll();
                 maxes.add(eil);
             }
             it.remove(); // avoids a ConcurrentModificationException
         }
-        return maxes.toArray(new ExtraItemLevel[numGetting]);
+        return new ArrayList(Arrays.asList(maxes.toArray(new ExtraItemLevel[numGetting])));
     }
 }
 
 class SortByProbEI implements Comparator<ExtraItemLevel> { 
     public int compare(ExtraItemLevel a, ExtraItemLevel b) { 
-        return a.probability.weight() - b.probability.weight();
+        return (int)((a.probability.weight() - b.probability.weight()) * 100);
     } 
 }
 
 class SortByProbAO implements Comparator<ObjectLevel> { 
     public int compare(ObjectLevel a, ObjectLevel b) { 
-        return a.probability.weight() - b.probability.weight();
+        return (int)((a.probability.weight() - b.probability.weight()) * 100);
     }
 }
 
@@ -113,13 +116,13 @@ class ExtraItemLevel {
 }
 
 class ObjectLevel {
-    ExtraItemLevel[] extraItems; // always sorted
+    ArrayList<ExtraItemLevel> extraItems; // always sorted
     String objectName;
 
     ProbTuple probability;
 
     ExtraItemLevel topExtraItem() {
-        return this.extraItems[0];
+        return this.extraItems.get(0);
     }
 
     void generatePredictions(ExtraItemTable eiTable, int numGetting) {
@@ -135,18 +138,18 @@ class ObjectLevel {
 
 class ActionLevel {
 
-    ObjectLevel[] objects; // always sorted
+    ArrayList<ObjectLevel> objects; // always sorted
     String actionName;
     
     ObjectLevel topObject() {
-        return objects[0];
+        return objects.get(0);
     }
 
     void generatePredictions( 
         ActionObjectTable aoTable, ExtraItemTable eiTable, int numGetting) {  
         this.objects = aoTable.getTopObjects(numGetting, actionName);
-        for(int i = 0; i < ObjectLevel.size(); i++) {
-            objects[i].generatePredictions(eiTable, numGetting);
+        for(int i = 0; i < this.objects.size(); i++) {
+            objects.get(i).generatePredictions(eiTable, numGetting);
         }
     }
 }
@@ -203,9 +206,16 @@ class PredictionTree {
 class SemanticPrediction {
 
     public static void main(String[] args) {
-    	File file = new File("C:\\Users\\user\\Documents\\HRI\\prediction\\input.txt"); 
-  
-		BufferedReader br = new BufferedReader(new FileReader(file)); 
+
+        File file = new File("C:\\Users\\User\\Documents\\HRI\\prediction\\input.txt"); 
+        Scanner sc = null;
+        try {
+            sc = new Scanner(file); 
+        }
+        catch (FileNotFoundException ex)  {
+            // insert code to run when exception occurs
+            System.out.println(ex);
+        }
 
 		HashMap<String, HashMap> aoTable = new HashMap<>();
 		HashMap<String, ProbTuple> objectProbMap = new HashMap<>();
@@ -216,7 +226,8 @@ class SemanticPrediction {
 		String currentAction = null;
 		String currentObject = null;
 
-		while ((st = br.readLine()) != null) {
+		while (sc.hasNextLine()) {
+            st = sc.nextLine();
 			char lastChar = st.charAt(st.length() - 1);
 			if(lastChar == ':') {
                 // is an action
