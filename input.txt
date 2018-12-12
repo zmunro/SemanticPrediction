@@ -1,6 +1,8 @@
 Pick-up:
-	noodles,0.07;
+	noodles(raw),0.06;
 		in the pantry,1.0
+	noodles(cooked),0.01;
+		~,1.0
  	water,0.1;
  		in the sink,1.0
  	pot,0.1;

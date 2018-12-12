@@ -58,6 +58,9 @@ class ActionObjectTable {
     ActionObjectTable(HashMap<String, HashMap<String, ProbTuple>> aoTable) {
         this.aoTable = aoTable;
     }
+
+    
+
 }
 
 class ExtraItemTable {
@@ -100,13 +103,13 @@ class ExtraItemTable {
 
 class SortByProbEI implements Comparator<ExtraItemLevel> { 
     public int compare(ExtraItemLevel a, ExtraItemLevel b) { 
-        return (int)((a.probability.weight() - b.probability.weight()) * 100);
+        return (int)((b.probability.weight() - a.probability.weight()) * 100);
     } 
 }
 
 class SortByProbAO implements Comparator<ObjectLevel> { 
     public int compare(ObjectLevel a, ObjectLevel b) { 
-        return (int)((a.probability.weight() - b.probability.weight()) * 100);
+        return (int)((b.probability.weight() - a.probability.weight()) * 100);
     }
 }
 
@@ -285,18 +288,19 @@ class SemanticPrediction {
         
         ActionObjectTable actionObjTable = new ActionObjectTable(aoTable);
         ExtraItemTable extraItemTable = new ExtraItemTable(eiTable);
-
-        System.out.println(actionObjTable.getProb("Chop", "ginger"));
-
         PredictionTree pt = new PredictionTree();
-        Scanner scanner = new Scanner(System.in);
         pt.aoTable = actionObjTable;
         pt.eiTable = extraItemTable;
+
+
+        Scanner scanner = new Scanner(System.in);
         System.out.println("enter action");
+
         String actionName = scanner.nextLine();
         ActionLevel newAction = new ActionLevel(actionName);
         pt.action = newAction;
         pt.generatePredictions(3);
+        
         FullSemantic fs = pt.getFullSemantic();
         System.out.print(fs.action.actionName + " ");
         System.out.print(fs.object.objectName + " ");
