@@ -1,60 +1,82 @@
 Pick-up:
-	noodles(raw),0.06;
+	noodles(raw),;
 		in the pantry,1.0
-	noodles(cooked),0.01;
+	rice(raw),;
+		in the pantry,
+	noodles(cooked),;
 		~,1.0
- 	water,0.1;
+ 	water,;
  		in the sink,1.0
- 	pot,0.1;
- 		in front of me,0.5
- 		on the stove,0.5
- 	soy sauce,0.05;
- 		in the pantry,1.0
- 	oil,0.05;
- 		in the pantry,1.0
- 	carrot,0.09;
- 		in the fridge,1.0
- 	broccoli,0.09;
- 		in the fridge,1.0
- 	celery,0.09;
- 		in the fridge,1.0
- 	green beans,0.09;
- 		in the fridge,1.0
- 	ginger,0.05;
- 		in the pantry,1.0
- 	garlic,0.12;
- 		in the pantry,1.0
- 	pepper,0.1;
- 		in the fridge,1.0
+ 	pot,;3
+ 		in front of me,2
+ 		on the stove,3
+ 	soy sauce,;
+ 		in the pantry,
+ 	onion(raw),;
+		from the pantry
+	salt,;
+		on the counter
+	pepper,;
+		on the counter
+	oil,;
+ 		in the pantry,
+ 	carrot(raw),;
+ 		in the fridge,
+ 	broccoli(raw),;
+ 		in the fridge,
+ 	celery(raw),;
+ 		in the fridge,
+ 	green beans(raw),;
+ 		in the fridge,
+ 	ginger(raw),;
+ 		in the pantry,
+ 	garlic(raw),;
+ 		in the pantry,
+ 	pepper(raw),;
+ 		in the fridge,
+	carrot(chopped),;
+ 		in the fridge,
+ 	broccoli(chopped),;
+ 		in the fridge,
+ 	celery(chopped),;
+ 		in the fridge,
+ 	green beans(chopped),;
+ 		in the fridge,
+ 	ginger(chopped),;
+ 		in the pantry,
+ 	garlic(chopped),;
+ 		in the pantry,
+ 	pepper(chopped),;
+ 		in the fridge,
 --
 Hand-me:
-	noodles,0.17;
+	noodles,;
 		~,1.0
-	water,0.20;
+	water,;
 		~,1.0
-	soy sauce,0.07;
+	soy sauce,;
 		~,1.0
-	oil,0.11;
+	oil,;
 		~,1.0
-	garlic,0.15;
+	garlic,;
 		~,1.0
-	pot,0.30;
+	pot,;
 		~,1.0
 --
 Put-down:
-	pot,0.2;
+	pot,;
 		on the stove,1.0
-	pepper,0.10;
+	pepper,;
 		on the counter,1.0
-	carrot,0.15;
+	carrot,;
 		on the counter,1.0
-	broccoli,0.15;
+	broccoli,;
 		on the counter,1.0
-	celery,0.15;
+	celery,;
 		on the counter,1.0
-	green beans,0.15;
+	green beans,;
 		on the counter,1.0
-	ginger,0.10;
+	ginger,;
 		on the counter,1.0
 --
 Turn-on:
@@ -80,14 +102,14 @@ Wash:
 		~,1.0
 --
 Chop:
-	ginger,0.12;
+	ginger,;
 		~,1.0
-	pepper,0.22;
+	pepper,;
 		~,1.0
-	broccoli,0.22;
+	broccoli,;
 		~,1.0
-	carrot,0.22;
+	carrot,;
 		~,1.0
-	celery,0.22;
+	celery,;
 		~,1.0
 !

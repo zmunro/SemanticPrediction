@@ -1,0 +1,68 @@
+Chop
+wash
+set 
+turn on 
+turn off
+put down
+hand me 
+pickup
+
+
+
+Pick-up 
+    rice(raw) 
+        in the pantry
+    pot
+        on the counter
+        on the stove (2)
+    onion(raw) 
+        from the pantry
+    onion(chopped)
+        on the counter (2)
+    pan
+        on the counter
+        on the stove
+    salt
+        on the counter
+    pepper
+        on the counter
+
+Hand-me
+    pot (2)
+    rice(raw)
+    onion(chopped)
+    pan
+    salt
+    pepper
+
+Put-down
+    pot
+        on the stove
+    onion(raw)
+        on the counter
+    pan
+        on the stove
+    onion(chopped)
+        in the pan
+
+Set
+    timer
+        for 15 minutes
+        for 10 minutes
+
+Chop 
+    onion(raw)
+        on the counter
+
+Turn-off
+    stove (2)
+
+Turn-on 
+    stove (2)
+
+
+
+
+
+
+

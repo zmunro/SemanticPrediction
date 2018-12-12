@@ -59,8 +59,17 @@ class ActionObjectTable {
         this.aoTable = aoTable;
     }
 
-    
+    // some obj has been chopped
+    // bias all unchopped states down and chopped state up
+    chopped(String object) {
+        
+    }
 
+    // some obj has been cooked
+    // bias all uncooked states down and cooked states up
+    cooked(String object) {
+        
+    }
 }
 
 class ExtraItemTable {
