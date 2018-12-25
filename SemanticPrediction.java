@@ -61,13 +61,13 @@ class ActionObjectTable {
 
     // some obj has been chopped
     // bias all unchopped states down and chopped state up
-    chopped(String object) {
+    void chopped(String object) {
         
     }
 
     // some obj has been cooked
     // bias all uncooked states down and cooked states up
-    cooked(String object) {
+    void cooked(String object) {
         
     }
 }
@@ -282,7 +282,24 @@ class SemanticPrediction {
                     extraItemProbMap = new HashMap<String, ProbTuple>();
                 }
                 currentObject = object;
-                Double prob = Double.valueOf(st.substring(0,st.length() - 1).split(",")[1]);
+                
+                Double prob = 0.0;
+                try {
+                    /* We suspect that this block of statement can throw 
+                     * exception so we handled it by placing these statements
+                     * inside try and handled the exception in catch block
+                     */
+                    prob = Double.valueOf(st.substring(0,st.length() - 1).split(",")[1]);
+                 }
+                 catch (Exception e) {
+                    /* This is a generic Exception handler which means it can handle
+                     * all the exceptions. This will execute if the exception is not
+                     * handled by previous catch blocks.
+                     */
+                    System.out.println("Exception occurred");
+                    System.out.println(st);
+                 }
+                
                 ProbTuple probability = new ProbTuple(prob, 0);
 				objectProbMap.put(object, probability);
 			} else {
