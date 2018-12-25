@@ -285,19 +285,12 @@ class SemanticPrediction {
                 
                 Double prob = 0.0;
                 try {
-                    /* We suspect that this block of statement can throw 
-                     * exception so we handled it by placing these statements
-                     * inside try and handled the exception in catch block
-                     */
                     prob = Double.valueOf(st.substring(0,st.length() - 1).split(",")[1]);
                  }
                  catch (Exception e) {
-                    /* This is a generic Exception handler which means it can handle
-                     * all the exceptions. This will execute if the exception is not
-                     * handled by previous catch blocks.
-                     */
                     System.out.println("Exception occurred");
                     System.out.println(st);
+                    return;
                  }
                 
                 ProbTuple probability = new ProbTuple(prob, 0);
@@ -318,30 +311,29 @@ class SemanticPrediction {
         pt.aoTable = actionObjTable;
         pt.eiTable = extraItemTable;
 
-
         Scanner scanner = new Scanner(System.in);
-        System.out.println("enter action");
-
-        String actionName = scanner.nextLine();
-        ActionLevel newAction = new ActionLevel(actionName);
-        pt.action = newAction;
-        pt.generatePredictions(3);
+        
+        ActionLevel newAction = null;
+        boolean invalidAction = true;
+        while(invalidAction) {
+            try{
+                System.out.println("Enter action: ");
+                String actionName = scanner.nextLine();
+                newAction = new ActionLevel(actionName);
+                pt.action = newAction;
+                pt.generatePredictions(3);
+                invalidAction = false;
+            } catch(Exception e) {
+                invalidAction = true;
+                System.out.println("Not a valid action!!");
+                System.out.println("------------------");
+            }
+        }
         
         FullSemantic fs = pt.getFullSemantic();
         System.out.print(fs.action.actionName + " ");
         System.out.print(fs.object.objectName + " ");
         System.out.println(fs.extraItem.extraItem);
 
-        // String line = "start";
-        // Scanner scanner = new Scanner(System.in);
-        // while(line != "end") {
-        //     System.out.println("enter action");
-        //     line = scanner.nextLine();
-        //     String action = line;
-        //     System.out.println("enter object");
-        //     String object = scanner.nextLine();
-        //     ProbTuple prob = aoTable.get(action).get(object);
-        //     System.out.println(prob.weight());
-        // }
 	}
 }
