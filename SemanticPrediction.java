@@ -16,7 +16,7 @@ class ProbTuple{
 
     ProbTuple(double staticProb) {
         this.staticProb = staticProb;
-        this.dynamicProb = 0.0;
+        this.dynamicProb = 0.5;
     }
 
     ProbTuple(double staticProb, double dynamicProb) {
@@ -30,10 +30,25 @@ class ActionObjectTable {
     //<actionName, map of aoPairs to probabilities>
     HashMap<String, HashMap<String, ProbTuple>> aoTable;
     
-    double getProb (String actionName, String objectName) {
+    double getProb(String actionName, String objectName) {
         HashMap<String, ProbTuple> map = this.aoTable.get(actionName);
         ProbTuple probs = map.get(objectName);
         return probs.weight();
+    }
+
+    void printProbs() {
+        Iterator it =  aoTable.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            System.out.println(pair.getKey());
+            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
+            Iterator objIt = map.entrySet().iterator();
+            while(objIt.hasNext()) {
+                Map.Entry objPair = (Map.Entry)objIt.next();
+                double prob = Math.round(map.get((String)objPair.getKey()).weight() * 1000) / 1000.0;
+                System.out.println("   " + objPair.getKey() + ": " + Double.toString(prob));
+            }
+        }
     }
 
     ArrayList<ObjectLevel> getTopObjects(int numGetting, String actionName) {
@@ -282,6 +297,7 @@ class SemanticPrediction {
 		String currentAction = null;
 		String currentObject = null;
 
+        // Kinda sloppy input processing algorithm
 		while (sc.hasNextLine()) {
             st = sc.nextLine().replaceAll("\\s+","");
             // System.out.println(st);
@@ -343,48 +359,40 @@ class SemanticPrediction {
         PredictionTree pt = new PredictionTree();
         pt.aoTable = actionObjTable;
         pt.eiTable = extraItemTable;
+
         // pt.aoTable.chopped("pepper(raw)");
         // pt.aoTable.potCooking();
 
-        // Scanner scanner = new Scanner(System.in);
-        
-        // ActionLevel newAction = null;
-        // boolean invalidAction = true;
-        // String userActionName = "";
-        // while(invalidAction) {
-        //     try{
-        //         System.out.println("Enter action: ");
-        //         userActionName = scanner.nextLine();
-        //         newAction = new ActionLevel(userActionName);
-        //         pt.action = newAction;
-                
-        //         pt.generatePredictions(3);
-        //         invalidAction = false;
-        //     } catch(Exception e) {
-        //         invalidAction = true;
-        //         System.out.println("Not a valid action!!");
-        //         System.out.println("------------------");
-        //     }
-        // }
-        // scanner.close();
-        // FullSemantic fs = pt.getFullSemantic();
-        // System.out.print(fs.action.actionName + " ");
-        // System.out.print(fs.object.objectName + " ");
-        // System.out.println(fs.extraItem.extraItem);
+        // test(pt);
 
-        Iterator it =  aoTable.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey());
-            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
-            Iterator objIt = map.entrySet().iterator();
-            while(objIt.hasNext()) {
-                Map.Entry objPair = (Map.Entry)objIt.next();
-                double prob = Math.round(map.get((String)objPair.getKey()).weight() * 1000) / 1000.0;
-                System.out.println(objPair.getKey() + ": " + Double.toString(prob));
+        // actionObjTable.printProbs();
+    }
+    
+    // Test out the prediction of a full semantic given an action
+    static void test(PredictionTree pt) {
+        Scanner scanner = new Scanner(System.in);
+        ActionLevel newAction = null;
+        boolean invalidAction = true;
+        String userActionName = "";
+        while(invalidAction) {
+            try{
+                System.out.println("Enter action: ");
+                userActionName = scanner.nextLine();
+                newAction = new ActionLevel(userActionName);
+                pt.action = newAction;
+                
+                pt.generatePredictions(3);
+                invalidAction = false;
+            } catch(Exception e) {
+                invalidAction = true;
+                System.out.println("Not a valid action!!");
+                System.out.println("------------------");
             }
         }
-
-
-	}
+        scanner.close();
+        FullSemantic fs = pt.getFullSemantic();
+        System.out.print(fs.action.actionName + " ");
+        System.out.print(fs.object.objectName + " ");
+        System.out.println(fs.extraItem.extraItem);
+    }
 }
