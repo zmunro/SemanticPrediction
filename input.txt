@@ -1,3 +1,4 @@
+--
 Pick-up:
 	noodles(raw),0.034;
 		in the pantry,1.0
@@ -131,14 +132,14 @@ Wash:
 	pepper(raw),0.02
 --
 Chop:
-	ginger(raw),0.02;
+	ginger(raw),0.2;
 		~,1.0
-	pepper(raw),0.02;
+	pepper(raw),0.2;
 		~,1.0
-	broccoli(raw),0.02;
+	broccoli(raw),0.2;
 		~,1.0
-	carrot(raw),0.02;
+	carrot(raw),0.2;
 		~,1.0
-	celery(raw),0.02;
+	celery(raw),0.2;
 		~,1.0
 !
