@@ -357,8 +357,13 @@ class SemanticPrediction {
                     System.out.println(st);
                     return;
                  }
-                
-                ProbTuple probability = new ProbTuple(prob);
+                ProbTuple probability;  
+                if (object.contains("(cooked)") || object.contains("(chopped)")) {
+                    probability= new ProbTuple(prob, 0);
+                } else {
+                    probability= new ProbTuple(prob);
+                }
+
 				objectProbMap.put(object, probability);
 			} else {
 				// is an extra item
@@ -377,7 +382,6 @@ class SemanticPrediction {
         pt.eiTable = extraItemTable;
 
         actionObjTable.printProbs();
-
     }
     
     // Test out the prediction of a full semantic given an action
