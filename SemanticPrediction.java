@@ -3,10 +3,12 @@ import java.lang.*;
 import java.awt.Desktop.Action;
 import java.io.*;
 
+// Stores the weight of a vertex between object/action or aoPair/extra item
 class ProbTuple{
     double staticProb;
     double dynamicProb;
 
+    // This can be modified to weight context higher or lower
     Double weight() {
         if(dynamicProb == 0.0) {
             return staticProb;
@@ -62,7 +64,15 @@ class ActionObjectTable {
     // some obj has been chopped
     // bias all unchopped states down and chopped state up
     void chopped(String object) {
-        
+        numRaw = 0;
+        Iterator it = aoTable.iterator();
+        while(it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            if (pair.getKey() == object) {
+                HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
+            }
+
+        }
     }
 
     // some obj has been cooked
@@ -122,6 +132,7 @@ class SortByProbAO implements Comparator<ObjectLevel> {
     }
 }
 
+// Only to be used in the Prediction Tree
 class ExtraItemLevel {
     ProbTuple probability;
     String extraItem;
@@ -136,6 +147,7 @@ class ExtraItemLevel {
     }
 }
 
+// Only to be used in the Prediction Tree
 class ObjectLevel {
     ArrayList<ExtraItemLevel> extraItems; // always sorted
     String objectName;
@@ -157,6 +169,7 @@ class ObjectLevel {
     }
 }
 
+// Only to be used in the Prediction Tree
 class ActionLevel {
 
     ArrayList<ObjectLevel> objects; // always sorted
