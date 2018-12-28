@@ -113,6 +113,22 @@ class ActionObjectTable {
             }
         }
     }
+
+    void panCooking() {
+        Iterator it = aoTable.entrySet().iterator();
+        // Go through each action and see if it is connected to the object
+        while(it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
+            // bias unchopped object down
+            if (map.containsKey("pan")) {
+                ProbTuple oldTuple = map.get("pan");
+                ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, 0);
+                map.put("pan", newTuple);
+                aoTable.put((String)pair.getKey(), map);
+            }
+        }
+    }
 }
 
 class ExtraItemTable {
@@ -360,12 +376,8 @@ class SemanticPrediction {
         pt.aoTable = actionObjTable;
         pt.eiTable = extraItemTable;
 
-        // pt.aoTable.chopped("pepper(raw)");
-        // pt.aoTable.potCooking();
+        actionObjTable.printProbs();
 
-        // test(pt);
-
-        // actionObjTable.printProbs();
     }
     
     // Test out the prediction of a full semantic given an action
