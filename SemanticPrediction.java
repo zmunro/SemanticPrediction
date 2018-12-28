@@ -10,10 +10,15 @@ class ProbTuple{
 
     // This can be modified to weight context higher or lower
     Double weight() {
-        if(dynamicProb == 0.0) {
+        if(dynamicProb == 0.5) {
             return staticProb;
         }
-        return (this.staticProb + this.dynamicProb) / 2.0;
+        return (this.staticProb + 5 * this.dynamicProb) / 6.0;
+    }
+
+    ProbTuple(double staticProb) {
+        this.staticProb = staticProb;
+        this.dynamicProb = 0.5;
     }
 
     ProbTuple(double staticProb, double dynamicProb) {
@@ -26,6 +31,7 @@ class ActionObjectTable {
     
     //<actionName, map of aoPairs to probabilities>
     HashMap<String, HashMap<String, ProbTuple>> aoTable;
+    
     double getProb (String actionName, String objectName) {
         HashMap<String, ProbTuple> map = this.aoTable.get(actionName);
         ProbTuple probs = map.get(objectName);
@@ -62,23 +68,37 @@ class ActionObjectTable {
     }
 
     // some obj has been chopped
-    // bias all unchopped states down and chopped state up
+    // bias all unchopped states down
     void chopped(String object) {
-        numRaw = 0;
-        Iterator it = aoTable.iterator();
+        Iterator it = aoTable.entrySet().iterator();
+        // Go through each action and see if it is connected to the object
         while(it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            if (pair.getKey() == object) {
-                HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
+            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
+            // bias unchopped object down
+            if (map.containsKey(object)) {
+                ProbTuple oldTuple = map.get(object);
+                ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, 0);
+                map.put(object, newTuple);
+                aoTable.put((String)pair.getKey(), map);
             }
-
         }
     }
 
-    // some obj has been cooked
-    // bias all uncooked states down and cooked states up
-    void cooked(String object) {
-        
+    void potCooking() {
+        Iterator it = aoTable.entrySet().iterator();
+        // Go through each action and see if it is connected to the object
+        while(it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
+            // bias unchopped object down
+            if (map.containsKey("pot")) {
+                ProbTuple oldTuple = map.get("pot");
+                ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, 0);
+                map.put("pot", newTuple);
+                aoTable.put((String)pair.getKey(), map);
+            }
+        }
     }
 }
 
@@ -266,8 +286,18 @@ class SemanticPrediction {
 
 		while (sc.hasNextLine()) {
             st = sc.nextLine().replaceAll("\\s+","");
+            // System.out.println(st);
             if( st.charAt(0) == '-') {
                 st = sc.nextLine().replaceAll("\\s+","");
+                System.out.println(st);
+                if (currentAction != null) {
+                    aoTable.put(currentAction, objectProbMap);
+                    objectProbMap = new HashMap<String, ProbTuple>();
+                    eiTable.put(currentObject, extraItemProbMap);
+                    extraItemProbMap = new HashMap<String, ProbTuple>();
+                }
+                currentAction = st;
+                currentObject = null;
             } else if (st.charAt(0) == '!') {
                 // System.out.println("found end");
                 aoTable.put(currentAction, objectProbMap);
@@ -323,17 +353,21 @@ class SemanticPrediction {
         PredictionTree pt = new PredictionTree();
         pt.aoTable = actionObjTable;
         pt.eiTable = extraItemTable;
+        pt.aoTable.chopped("pepper(raw)");
+        pt.aoTable.potCooking();
 
         Scanner scanner = new Scanner(System.in);
         
         ActionLevel newAction = null;
         boolean invalidAction = true;
+        String userActionName = "";
         while(invalidAction) {
             try{
                 System.out.println("Enter action: ");
-                String actionName = scanner.nextLine();
-                newAction = new ActionLevel(actionName);
+                userActionName = scanner.nextLine();
+                newAction = new ActionLevel(userActionName);
                 pt.action = newAction;
+                
                 pt.generatePredictions(3);
                 invalidAction = false;
             } catch(Exception e) {
@@ -342,11 +376,11 @@ class SemanticPrediction {
                 System.out.println("------------------");
             }
         }
-        
+        scanner.close();
         FullSemantic fs = pt.getFullSemantic();
         System.out.print(fs.action.actionName + " ");
         System.out.print(fs.object.objectName + " ");
         System.out.println(fs.extraItem.extraItem);
-
+        // System.out.println(pt.aoTable.getProb("Put-down", "pot"));
 	}
 }

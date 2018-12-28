@@ -7,7 +7,7 @@ Pick-up:
 		~,1.0
  	water,0.068;
  		in the sink,1.0
- 	pot,0.17;
+ 	pot,0.07;
  		in front of me,2
  		on the stove,3
  	soy sauce,0.034;
