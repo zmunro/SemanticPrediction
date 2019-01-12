@@ -80,9 +80,12 @@ class ActionObjectTable {
         this.aoTable = aoTable;
     }
 
-    // some obj has been chopped
-    // bias all unchopped states down
-    void chopped(String object) {
+    // biases the weight of objects
+    // args:
+    //     object: name of object/property to bias
+    //     strength: percent to multiply current dynamicProb by
+    //     override: if true then dynamicProb is set to strength provided     
+    void bias(String object, double strength, boolean override){
         Iterator it = aoTable.entrySet().iterator();
         // Go through each action and see if it is connected to the object
         while(it.hasNext()) {
@@ -91,40 +94,12 @@ class ActionObjectTable {
             // bias unchopped object down
             if (map.containsKey(object)) {
                 ProbTuple oldTuple = map.get(object);
-                ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, 0);
+                if(override) {
+                    ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, strength);
+                } else {
+                    ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, oldTuple.dynamicProb * strength);
+                }
                 map.put(object, newTuple);
-                aoTable.put((String)pair.getKey(), map);
-            }
-        }
-    }
-
-    void potCooking() {
-        Iterator it = aoTable.entrySet().iterator();
-        // Go through each action and see if it is connected to the object
-        while(it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
-            // bias unchopped object down
-            if (map.containsKey("pot")) {
-                ProbTuple oldTuple = map.get("pot");
-                ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, 0);
-                map.put("pot", newTuple);
-                aoTable.put((String)pair.getKey(), map);
-            }
-        }
-    }
-
-    void panCooking() {
-        Iterator it = aoTable.entrySet().iterator();
-        // Go through each action and see if it is connected to the object
-        while(it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
-            // bias unchopped object down
-            if (map.containsKey("pan")) {
-                ProbTuple oldTuple = map.get("pan");
-                ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, 0);
-                map.put("pan", newTuple);
                 aoTable.put((String)pair.getKey(), map);
             }
         }
