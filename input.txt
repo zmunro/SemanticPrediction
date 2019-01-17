@@ -1,11 +1,9 @@
---
 Pick-up:
-	noodles(raw),0.034;
+	noodles,0.068;
+		in the pantry,0.5
+		~,0.5
+	rice,0.034;
 		in the pantry,1.0
-	rice(raw),0.034;
-		in the pantry,1.0
-	noodles(cooked),0.034;
-		~,1.0
  	water,0.068;
  		in the sink,1.0
  	pot,0.07;
@@ -13,7 +11,7 @@ Pick-up:
  		on the stove,3
  	soy sauce,0.034;
  		in the pantry,1.0
- 	onion(raw),0.034;
+ 	onion,0.034;
 		from the pantry,1.0
 	salt,0.034;
 		on the counter,1.0
@@ -21,35 +19,27 @@ Pick-up:
 		on the counter,1.0
 	oil,0.034;
  		in the pantry,1.0
- 	carrot(raw),0.034;
- 		in the fridge,1.0
- 	broccoli(raw),0.034;
- 		in the fridge,1.0
- 	celery(raw),0.034;
- 		in the fridge,1.0
- 	green beans(raw),0.034;
- 		in the fridge,1.0
- 	ginger(raw),0.034;
- 		in the pantry,1.0
- 	garlic(raw),0.034;
- 		in the pantry,1.0
- 	pepper(raw),0.034;
- 		in the fridge,1.0
-	carrot(chopped),0.034;
- 		on the counter,1.0
- 	broccoli(chopped),0.034;
- 		on the counter,1.0
- 	celery(chopped),0.034;
- 		on the counter,1.0
- 	green beans(chopped),0.034;
- 		on the counter,1.0
- 	ginger(chopped),0.034;
- 		on the counter,1.0
- 	garlic(chopped),0.034;
- 		on the counter,1.0
- 	pepper(chopped),0.034;
- 		on the counter,1.0
---
+ 	carrot,0.068;
+ 		in the fridge,0.5
+		on the counter,0.5
+ 	broccoli,0.068;
+ 		in the fridge,0.5
+		on the counter,0.5
+	celery,0.068;
+ 		in the fridge,0.5
+		on the counter,0.5
+	green beans,0.068;
+ 		in the fridge,0.5
+		on the counter,0.5
+	ginger,0.068;
+ 		in the fridge,0.5
+		on the counter,0.5
+	garlic,0.068;
+ 		in the fridge,0.5
+		on the counter,0.5
+	pepper,0.068;
+ 		in the fridge,0.5
+		on the counter,0.5
 Hand-me:
 	noodles,0.05;
 		~,1.0
@@ -59,87 +49,63 @@ Hand-me:
 		~,1.0
 	oil,0.1;
 		~,1.0
-	garlic(raw),0.05;
-		~,1.0
-	garlic(chopped),0.05;
+	garlic,0.1;
 		~,1.0
 	pot,0.1;
 		~,1.0
-	rice(raw),0.05;
+	rice,0.05;
 		~,1.0
-	onion(chopped),0.05;
-		~,1.0
-	onion(raw),0.05;
+	onion,0.1;
 		~,1.0
 	pan,0.1;
 		~,1.0
 	salt,0.1;
 		~,1.0
-	pepper(chopped),0.05;
+	pepper,0.1;
 		~,1.0
-	pepper(raw),0.05;
-		~,1.0
---
 Put-down:
 	pot,0.14;
 		on the stove,1.0
-	pepper(chopped),0.07;
+	pepper,0.14;
 		on the counter,1.0
-	carrot(chopped),0.07;
+	carrot,0.14;
 		on the counter,1.0
-	broccoli(chopped),0.07;
+	broccoli,0.14;
 		on the counter,1.0
-	celery(chopped),0.07;
+	celery,0.14;
 		on the counter,1.0
-	green beans(chopped),0.07;
+	green beans,0.14;
 		on the counter,1.0
-	ginger(chopped),0.07;
+	ginger,0.14;
 		on the counter,1.0
-	pepper(raw),0.07;
-		on the counter,1.0
-	carrot(raw),0.07;
-		on the counter,1.0
-	broccoli(raw),0.07;
-		on the counter,1.0
-	celery(raw),0.07;
-		on the counter,1.0
-	green beans(raw),0.07;
-		on the counter,1.0
-	ginger(raw),0.07;
-		on the counter,1.0
---
 Turn-on:
 	stove,1.0;
 		~,1.0
---
 Turn-off:
 	stove,1.0;
 		~,1.0
---
 Set:
 	timer,1.0;
 		for 10 minutes,1.0
---
 Wash:
-	carrot(raw),0.2;
+	carrot,0.2;
 		~,1.0
-	broccoli(raw),0.2;
+	broccoli,0.2;
 		~,1.0
-	celery(raw),0.2;
+	celery,0.2;
 		~,1.0
-	green beans(raw),0.2;
+	green beans,0.2;
 		~,1.0
-	pepper(raw),0.02
---
+	pepper,0.02
 Chop:
-	ginger(raw),0.2;
+	ginger,0.2;
 		~,1.0
-	pepper(raw),0.2;
+	pepper,0.2;
 		~,1.0
-	broccoli(raw),0.2;
+	broccoli,0.2;
 		~,1.0
-	carrot(raw),0.2;
+	carrot,0.2;
 		~,1.0
-	celery(raw),0.2;
+	celery,0.2;
 		~,1.0
 !

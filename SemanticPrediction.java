@@ -28,11 +28,11 @@ class ProbTuple{
 class ActionObjectTable {
     
     //<actionName, map of aoPairs to probabilities>
-    HashMap<String, HashMap<String, ProbTuple>> aoTable;
+    HashMap<String, HashMap<String, Object>> aoTable;
     
     double getProb(String actionName, String objectName) {
-        HashMap<String, ProbTuple> map = this.aoTable.get(actionName);
-        ProbTuple probs = map.get(objectName);
+        HashMap<String, Object> map = this.aoTable.get(actionName);
+        ProbTuple probs = map.get(objectName).prob;
         return probs.weight();
     }
 
@@ -41,43 +41,35 @@ class ActionObjectTable {
         while(it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             System.out.println(pair.getKey());
-            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
+            HashMap<String, Object> map = aoTable.get(pair.getKey());
             Iterator objIt = map.entrySet().iterator();
             while(objIt.hasNext()) {
                 Map.Entry objPair = (Map.Entry)objIt.next();
-                double prob = Math.round(map.get((String)objPair.getKey()).weight() * 1000) / 1000.0;
+                double prob = Math.round(map.get((String)objPair.getKey()).prob.weight() * 1000) / 1000.0;
                 System.out.println("   " + objPair.getKey() + ": " + Double.toString(prob));
             }
         }
     }
 
-    ArrayList<ObjectLevel> getTopObjects(int numGetting, String actionName) {
-        PriorityQueue<ObjectLevel> maxes = new 
-            PriorityQueue<ObjectLevel>(new SortByProbAO());
+    ArrayList<Object> getTopObjects(int numGetting, String actionName) {
+        PriorityQueue<Object> maxes = new 
+            PriorityQueue<Object>(new SortByProbAO());
         Iterator it = aoTable.get(actionName).entrySet().iterator();
 
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            ProbTuple val = aoTable.get(actionName).get(pair.getKey());
-            ObjectLevel objlev = new ObjectLevel(
-                pair.getKey().toString(),
-                val
-            );
-
+            Object obj = aoTable.get(actionName).get(pair.getKey());
             
             if (maxes.size() < numGetting) {
-                maxes.add(objlev);
-            } else if (val.weight() > maxes.peek().probability.weight()) {
+                maxes.add(obj);
+            } else if (obj.prob.weight() > maxes.peek().prob.weight()) {
                 maxes.poll();
-                maxes.add(objlev);
+                maxes.add(obj);
             }
             it.remove(); // avoids a ConcurrentModificationException
         }
-        return new ArrayList(Arrays.asList(maxes.toArray(new ObjectLevel[numGetting])));
-    }
-
-    ActionObjectTable(HashMap<String, HashMap<String, ProbTuple>> aoTable) {
-        this.aoTable = aoTable;
+        ArrayList<Object> finalArray = new ArrayList(Arrays.asList(maxes.toArray(new Object[numGetting])));
+        return finalArray;
     }
 
     // biases the weight of objects
@@ -85,74 +77,72 @@ class ActionObjectTable {
     //     object: name of object/property to bias
     //     strength: percent to multiply current dynamicProb by
     //     override: if true then dynamicProb is set to strength provided     
-    void bias(String object, double strength, boolean override){
+    void bias(String objectName, double strength, boolean override){
         Iterator it = aoTable.entrySet().iterator();
         // Go through each action and see if it is connected to the object
         while(it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            HashMap<String, ProbTuple> map = aoTable.get(pair.getKey());
+            HashMap<String, Object> map = aoTable.get(pair.getKey());
             // bias unchopped object down
-            if (map.containsKey(object)) {
-                ProbTuple oldTuple = map.get(object);
+            if (map.containsKey(objectName)) {
+                Object obj = map.get(objectName);
+                ProbTuple newTuple;
                 if(override) {
-                    ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, strength);
+                    newTuple = new ProbTuple(obj.prob.staticProb, strength);
                 } else {
-                    ProbTuple newTuple = new ProbTuple(oldTuple.staticProb, oldTuple.dynamicProb * strength);
+                    newTuple = new ProbTuple(obj.prob.staticProb, obj.prob.dynamicProb * strength);
                 }
-                map.put(object, newTuple);
+                obj.prob = newTuple;
+                map.put(objectName, obj);
                 aoTable.put((String)pair.getKey(), map);
             }
         }
+    }
+
+    ActionObjectTable(HashMap<String, HashMap<String, Object>> aoTable) {
+        this.aoTable = aoTable;
     }
 }
 
 class ExtraItemTable {
     //<aoPair, map of ExtraItem strings to probabilities>
-    HashMap<String, HashMap<String, ProbTuple>> eiTable;
+    HashMap<String, HashMap<String, ExtraItem>> eiTable;
 
-    double getProb (String object, String extraItem) {
-        HashMap<String, ProbTuple> map = this.eiTable.get(object);
-        ProbTuple probs = map.get(extraItem);
-        return probs.weight();
-    }
-
-    ArrayList<ExtraItemLevel> getTopExtraItems(int numGetting, String object) {
-        PriorityQueue<ExtraItemLevel> maxes = new 
-            PriorityQueue<ExtraItemLevel>(new SortByProbEI());
-        Iterator it = eiTable.get(object).entrySet().iterator();
-
+    ArrayList<ExtraItem> getTopExtraItems(int numGetting, String objectName) {
+        PriorityQueue<ExtraItem> maxes = new 
+            PriorityQueue<ExtraItem>(new SortByProbEI());
+        Iterator it = eiTable.get(objectName).entrySet().iterator();
+        int numGotten = 0;
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            ProbTuple val = eiTable.get(object).get(pair.getKey());
-            ExtraItemLevel eil = new ExtraItemLevel(
-                (String)pair.getKey(),
-                val
-            );
+            ExtraItem item = eiTable.get(objectName).get(pair.getKey());
+ 
             if (maxes.size() < numGetting) {
-                maxes.add(eil);
-            } else if (val.weight() > maxes.peek().probability.weight()) {
+                maxes.add(item);
+                numGotten++;
+            } else if (item.prob.weight() > maxes.peek().prob.weight()) {
                 maxes.poll();
-                maxes.add(eil);
+                maxes.add(item);
             }
             it.remove(); // avoids a ConcurrentModificationException
         }
-        return new ArrayList(Arrays.asList(maxes.toArray(new ExtraItemLevel[numGetting])));
+        return new ArrayList(Arrays.asList(maxes.toArray(new ExtraItem[numGotten])));
     }
 
-    ExtraItemTable(HashMap<String, HashMap<String, ProbTuple>> eiTable) {
+    ExtraItemTable(HashMap<String, HashMap<String, ExtraItem>> eiTable) {
         this.eiTable = eiTable;
     }
 }
 
-class SortByProbEI implements Comparator<ExtraItemLevel> { 
-    public int compare(ExtraItemLevel a, ExtraItemLevel b) { 
-        return (int)((b.probability.weight() - a.probability.weight()) * 100);
+class SortByProbEI implements Comparator<ExtraItem> { 
+    public int compare(ExtraItem a, ExtraItem b) { 
+        return (int)((b.prob.weight() - a.prob.weight()) * 100);
     } 
 }
 
-class SortByProbAO implements Comparator<ObjectLevel> { 
-    public int compare(ObjectLevel a, ObjectLevel b) { 
-        return (int)((b.probability.weight() - a.probability.weight()) * 100);
+class SortByProbAO implements Comparator<Object> { 
+    public int compare(Object a, Object b) { 
+        return (int)((b.prob.weight() - a.prob.weight()) * 100);
     }
 }
 
@@ -165,9 +155,9 @@ class ExtraItemLevel {
         return this.probability.weight();
     }
 
-    ExtraItemLevel(String extraItem, ProbTuple prob) {
-        this.extraItem = extraItem;
-        this.probability = prob;
+    ExtraItemLevel(ExtraItem ei) {
+        this.extraItem = ei.name;
+        this.probability = ei.prob;
     }
 }
 
@@ -183,12 +173,16 @@ class ObjectLevel {
     }
 
     void generatePredictions(ExtraItemTable eiTable, int numGetting) {
-        this.extraItems = eiTable.getTopExtraItems(numGetting, objectName);
+        ArrayList<ExtraItem> items = eiTable.getTopExtraItems(numGetting, objectName);
+        for(int i = 0; i < items.size(); i++) {
+            ExtraItemLevel eiLevel = new ExtraItemLevel(items.get(i));
+            this.extraItems.add(eiLevel);
+        }
     }
 
-    ObjectLevel(String object, ProbTuple prob) {
-        this.objectName = object;
-        this.probability = prob;
+    ObjectLevel(Object obj) {
+        this.objectName = obj.name;
+        this.probability = obj.prob;
         this.extraItems = new ArrayList<ExtraItemLevel>();
     }
 }
@@ -205,14 +199,18 @@ class ActionLevel {
 
     void generatePredictions( 
         ActionObjectTable aoTable, ExtraItemTable eiTable, int numGetting) {  
-        this.objects = aoTable.getTopObjects(numGetting, actionName);
-        for(int i = 0; i < this.objects.size(); i++) {
-            objects.get(i).generatePredictions(eiTable, numGetting);
+        ArrayList<Object> newObjects = aoTable.getTopObjects(numGetting, actionName);
+
+        for(int i = 0; i < newObjects.size(); i++) {
+            ObjectLevel objLevel = new ObjectLevel(newObjects.get(i));
+            objLevel.generatePredictions(eiTable, numGetting);
+            this.objects.add(objLevel);
         }
     }
     
     ActionLevel(String action) {
         this.actionName = action;
+        this.objects = new ArrayList<ObjectLevel>();
     }
 }
 
@@ -220,6 +218,7 @@ class FullSemantic {
     ActionLevel action;
     ObjectLevel object;
     ExtraItemLevel extraItem;
+    double likelihood;
 
     // When you instantiate a FullSemantic, it generates the predicted semantic
     FullSemantic(ActionLevel action) {
@@ -265,6 +264,26 @@ class PredictionTree {
     }
 }
 
+class Object {
+    String name;
+    ProbTuple prob;
+
+    Object(String name, ProbTuple prob) {
+        this.name = name;
+        this.prob = prob;
+    }
+}
+
+class ExtraItem {
+    String name;
+    ProbTuple prob;
+
+    ExtraItem(String name, ProbTuple prob) {
+        this.name = name;
+        this.prob = prob;
+    }
+}
+
 class SemanticPrediction {
 
     public static void main(String[] args) {
@@ -279,10 +298,10 @@ class SemanticPrediction {
             System.out.println(ex);
         }
 
-		HashMap<String, HashMap<String, ProbTuple>> aoTable = new HashMap<>();
-		HashMap<String, ProbTuple> objectProbMap = new HashMap<>();
-		HashMap<String, HashMap<String, ProbTuple>> eiTable = new HashMap<>();
-		HashMap<String, ProbTuple> extraItemProbMap = new HashMap<>();
+		HashMap<String, HashMap<String, Object>> aoTable = new HashMap<>();
+		HashMap<String, Object> objectMap = new HashMap<>();
+		HashMap<String, HashMap<String, ExtraItem>> eiTable = new HashMap<>();
+		HashMap<String, ExtraItem> extraItemMap = new HashMap<>();
 
 		String st; 
 		String currentAction = null;
@@ -291,62 +310,50 @@ class SemanticPrediction {
         // Kinda sloppy input processing algorithm
 		while (sc.hasNextLine()) {
             st = sc.nextLine().replaceAll("\\s+","");
-            // System.out.println(st);
-            if( st.charAt(0) == '-') {
-                st = sc.nextLine().replaceAll("\\s+","");
-            } else if (st.charAt(0) == '!') {
-                // System.out.println("found end");
-                aoTable.put(currentAction, objectProbMap);
-                objectProbMap = new HashMap<String, ProbTuple>();
-                eiTable.put(currentObject, extraItemProbMap);
-                extraItemProbMap = new HashMap<String, ProbTuple>();
+            char lastChar = st.charAt(st.length() - 1);
+
+            if (st.charAt(0) == '!') { // ---------CHECK FOR END OF FILE----------
+                aoTable.put(currentAction, objectMap);
+                objectMap = new HashMap<String, Object>();
+                eiTable.put(currentObject, extraItemMap);
+                extraItemMap = new HashMap<String, ExtraItem>();
                 break;
             }
+            
+			if(lastChar == ':') { // ------------ NEW ACTION ---------
+                String actionName = st.split(":")[0];
 
-			char lastChar = st.charAt(st.length() - 1);
-			if(lastChar == ':') {
-                // is an action
-                String action = st.split(":")[0];
-                // System.out.println("action: " + action);
-				if (currentAction != null) {
-					aoTable.put(currentAction, objectProbMap);
-					objectProbMap = new HashMap<String, ProbTuple>();
+                if (currentAction != null) {
+					aoTable.put(currentAction, objectMap);
+					objectMap = new HashMap<String, Object>();
                 }
-				currentAction = action;
-			} else if  (lastChar == ';') {
-				// is an object
-                String object = st.split(",")[0];
-                // System.out.println("    object: " + object);
+                currentAction = actionName;
+			} else if  (lastChar == ';') { // ---------NEW OBJECT---------
+				
+                String objectName = st.split(",")[0];
+
+                //Store the previous ExtraItemMap
                 if (currentObject != null) {
-                    eiTable.put(currentObject, extraItemProbMap);
-                    extraItemProbMap = new HashMap<String, ProbTuple>();
+                    eiTable.put(currentObject, extraItemMap);
+                    extraItemMap = new HashMap<String, ExtraItem>();
                 }
-                currentObject = object;
                 
                 Double prob = 0.0;
                 try {
                     prob = Double.valueOf(st.substring(0,st.length() - 1).split(",")[1]);
-                 }
-                 catch (Exception e) {
+                }
+                catch (Exception e) {
                     System.out.println("Exception occurred");
                     System.out.println(st);
                     return;
-                 }
-                ProbTuple probability;  
-                if (object.contains("(cooked)") || object.contains("(chopped)")) {
-                    probability= new ProbTuple(prob, 0);
-                } else {
-                    probability= new ProbTuple(prob);
                 }
-
-				objectProbMap.put(object, probability);
-			} else {
-				// is an extra item
-                String extraItem = st.split(",")[0];
-                // System.out.println("        ei: " + extraItem);
+                currentObject = objectName;
+				objectMap.put(objectName, new Object(objectName, new ProbTuple(prob)));
+			} else { // ---------- NEW EXTRA ITEM -------------
+                String eiName = st.split(",")[0];
                 Double prob = Double.valueOf(st.split(",")[1]);
-                ProbTuple probability = new ProbTuple(prob);
-				extraItemProbMap.put(extraItem, probability);
+                ExtraItem item = new ExtraItem(eiName, new ProbTuple(prob));
+				extraItemMap.put(eiName, item);
 			}
         } 
         
@@ -356,7 +363,8 @@ class SemanticPrediction {
         pt.aoTable = actionObjTable;
         pt.eiTable = extraItemTable;
 
-        actionObjTable.printProbs();
+        // actionObjTable.printProbs();
+        test(pt);
     }
     
     // Test out the prediction of a full semantic given an action
@@ -376,6 +384,7 @@ class SemanticPrediction {
                 invalidAction = false;
             } catch(Exception e) {
                 invalidAction = true;
+                System.out.println(e);
                 System.out.println("Not a valid action!!");
                 System.out.println("------------------");
             }
