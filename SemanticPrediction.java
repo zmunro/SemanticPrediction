@@ -72,31 +72,34 @@ class ActionObjectTable {
         return finalArray;
     }
 
-    // biases the weight of objects
-    // args:
-    //     object: name of object/property to bias
-    //     strength: percent to multiply current dynamicProb by
-    //     override: if true then dynamicProb is set to strength provided     
-    void bias(String objectName, double strength, boolean override){
-        Iterator it = aoTable.entrySet().iterator();
-        // Go through each action and see if it is connected to the object
+    // biases the weight of objects corresponding to any action
+    void anyActionBias(String objectName, double strength){
+        Iterator<Map.Entry<String, HashMap<String,Object>>> it = aoTable.entrySet().iterator();
         while(it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
+            Map.Entry<String, Object> pair = (Map.Entry)it.next();
             HashMap<String, Object> map = aoTable.get(pair.getKey());
-            // bias unchopped object down
             if (map.containsKey(objectName)) {
                 Object obj = map.get(objectName);
                 ProbTuple newTuple;
-                if(override) {
-                    newTuple = new ProbTuple(obj.prob.staticProb, strength);
-                } else {
-                    newTuple = new ProbTuple(obj.prob.staticProb, obj.prob.dynamicProb * strength);
-                }
+                newTuple = new ProbTuple(obj.prob.staticProb, strength);
                 obj.prob = newTuple;
                 map.put(objectName, obj);
                 aoTable.put((String)pair.getKey(), map);
             }
         }
+    }
+
+    // for setting bias on a specific action AND object
+    void bias(String actionName, String objectName, double strength) {
+        if (actionName.equals("any")) {
+            anyActionBias(objectName, strength);
+            return;
+        }
+        HashMap<String, Object> objMap = aoTable.get(actionName);
+        Object temp = objMap.get(objectName);
+        temp.prob.dynamicProb = strength;
+        objMap.put(objectName, temp);
+        aoTable.put(actionName, objMap);
     }
 
     ActionObjectTable(HashMap<String, HashMap<String, Object>> aoTable) {
@@ -391,8 +394,10 @@ class SemanticPrediction {
         }
         scanner.close();
         FullSemantic fs = pt.getFullSemantic();
-        System.out.print(fs.action.actionName + " ");
+        System.out.print(fs.action.actionName);
         System.out.print(fs.object.objectName + " ");
-        System.out.println(fs.extraItem.extraItem);
+        System.out.println(fs.extraItem.extraItem + " ");
+        Double prob = fs.object.probability.weight() * fs.extraItem.probability.weight();
+        System.out.println("prob: " + prob);
     }
 }
