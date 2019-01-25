@@ -108,13 +108,13 @@ class ActionObjectTable {
 }
 
 class ExtraItemTable {
-    //<aoPair, map of ExtraItem strings to probabilities>
+
     HashMap<String, HashMap<String, ExtraItem>> eiTable;
 
     ArrayList<ExtraItem> getTopExtraItems(int numGetting, String objectName) {
         PriorityQueue<ExtraItem> maxes = new 
             PriorityQueue<ExtraItem>(new SortByProbEI());
-        Iterator it = eiTable.get(objectName).entrySet().iterator();
+        Iterator<Map.Entry<String, ExtraItem>> it = eiTable.get(objectName).entrySet().iterator();
         int numGotten = 0;
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
