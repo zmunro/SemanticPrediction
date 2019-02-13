@@ -54,37 +54,28 @@ class ActionObjectTable {
     ArrayList<Object> getTopObjects(int numGetting, String actionName) {
         PriorityQueue<Object> maxes = new 
             PriorityQueue<Object>(new SortByProbAO());
-        Iterator it = aoTable.get(actionName).entrySet().iterator();
 
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            Object obj = aoTable.get(actionName).get(pair.getKey());
-            
-            if (maxes.size() < numGetting) {
-                maxes.add(obj);
-            } else if (obj.prob.weight() > maxes.peek().prob.weight()) {
-                maxes.poll();
-                maxes.add(obj);
-            }
-            it.remove(); // avoids a ConcurrentModificationException
+        HashMap<String, Object> objectMap = aoTable.get(actionName);
+        List<Object> list = new ArrayList<Object>(objectMap.values());
+        maxes.addAll(list);
+        ArrayList<Object> top = new ArrayList<Object>(numGetting);
+        for(int i = 0; i < numGetting && i < list.size(); i++) {
+            top.add(maxes.poll());
         }
-        ArrayList<Object> finalArray = new ArrayList(Arrays.asList(maxes.toArray(new Object[numGetting])));
-        return finalArray;
+        return top;
     }
 
     // biases the weight of objects corresponding to any action
     void anyActionBias(String objectName, double strength){
-        Iterator<Map.Entry<String, HashMap<String,Object>>> it = aoTable.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry<String, Object> pair = (Map.Entry)it.next();
-            HashMap<String, Object> map = aoTable.get(pair.getKey());
+        for (Map.Entry<String, HashMap<String, Object>> entry : aoTable.entrySet()) {
+            HashMap<String, Object> map = aoTable.get(entry.getKey());
             if (map.containsKey(objectName)) {
                 Object obj = map.get(objectName);
                 ProbTuple newTuple;
                 newTuple = new ProbTuple(obj.prob.staticProb, strength);
                 obj.prob = newTuple;
                 map.put(objectName, obj);
-                aoTable.put((String)pair.getKey(), map);
+                aoTable.put((String)entry.getKey(), map);
             }
         }
     }
@@ -114,22 +105,28 @@ class ExtraItemTable {
     ArrayList<ExtraItem> getTopExtraItems(int numGetting, String objectName) {
         PriorityQueue<ExtraItem> maxes = new 
             PriorityQueue<ExtraItem>(new SortByProbEI());
-        Iterator<Map.Entry<String, ExtraItem>> it = eiTable.get(objectName).entrySet().iterator();
-        int numGotten = 0;
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            ExtraItem item = eiTable.get(objectName).get(pair.getKey());
- 
-            if (maxes.size() < numGetting) {
-                maxes.add(item);
-                numGotten++;
-            } else if (item.prob.weight() > maxes.peek().prob.weight()) {
-                maxes.poll();
-                maxes.add(item);
-            }
-            it.remove(); // avoids a ConcurrentModificationException
+
+        HashMap<String, ExtraItem> eiMap = eiTable.get(objectName);
+        List<ExtraItem> list = new ArrayList<ExtraItem>(eiMap.values());
+        maxes.addAll(list);
+        ArrayList<ExtraItem> top = new ArrayList<ExtraItem>(numGetting);
+        for(int i = 0; i < numGetting && i < list.size(); i++) {
+            top.add(maxes.poll());
         }
-        return new ArrayList(Arrays.asList(maxes.toArray(new ExtraItem[numGotten])));
+        return top;
+
+        // for (Map.Entry<String, ExtraItem> entry : eiTable.get(objectName).entrySet()) {
+        //     HashMap<String, ExtraItem> map = eiTable.get(entry.getKey());
+        //     ExtraItem item = eiTable.get(objectName).get(entry.getKey());
+        //     if (maxes.size() < numGetting) {
+        //         maxes.add(item);
+        //         numGotten++;
+        //     } else if (item.prob.weight() > maxes.peek().prob.weight()) {
+        //         maxes.poll();
+        //         maxes.add(item);
+        //     }
+        // }
+        // return new ArrayList(Arrays.asList(maxes.toArray(new ExtraItem[numGotten])));
     }
 
     ExtraItemTable(HashMap<String, HashMap<String, ExtraItem>> eiTable) {
@@ -200,7 +197,7 @@ class ActionLevel {
         return objects.get(0);
     }
 
-    void generatePredictions( 
+    void generatePredictions(
         ActionObjectTable aoTable, ExtraItemTable eiTable, int numGetting) {  
         ArrayList<Object> newObjects = aoTable.getTopObjects(numGetting, actionName);
 
@@ -376,28 +373,30 @@ class SemanticPrediction {
         ActionLevel newAction = null;
         boolean invalidAction = true;
         String userActionName = "";
-        while(invalidAction) {
+        int x = 5;
+        while(x != 0) {
             try{
                 System.out.println("Enter action: ");
                 userActionName = scanner.nextLine();
                 newAction = new ActionLevel(userActionName);
                 pt.action = newAction;
-                
                 pt.generatePredictions(3);
                 invalidAction = false;
+                FullSemantic fs = pt.getFullSemantic();
+		        System.out.print(fs.action.actionName + " ");
+		        System.out.print(fs.object.objectName + " ");
+		        System.out.println(fs.extraItem.extraItem + " ");
+		        Double prob = fs.object.probability.weight() * fs.extraItem.probability.weight();
+                System.out.println("prob: " + prob);
             } catch(Exception e) {
                 invalidAction = true;
                 System.out.println(e);
                 System.out.println("Not a valid action!!");
                 System.out.println("------------------");
             }
-        }
+            x--;
+		}
         scanner.close();
-        FullSemantic fs = pt.getFullSemantic();
-        System.out.print(fs.action.actionName);
-        System.out.print(fs.object.objectName + " ");
-        System.out.println(fs.extraItem.extraItem + " ");
-        Double prob = fs.object.probability.weight() * fs.extraItem.probability.weight();
-        System.out.println("prob: " + prob);
+        
     }
 }
