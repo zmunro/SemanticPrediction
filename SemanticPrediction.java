@@ -114,19 +114,6 @@ class ExtraItemTable {
             top.add(maxes.poll());
         }
         return top;
-
-        // for (Map.Entry<String, ExtraItem> entry : eiTable.get(objectName).entrySet()) {
-        //     HashMap<String, ExtraItem> map = eiTable.get(entry.getKey());
-        //     ExtraItem item = eiTable.get(objectName).get(entry.getKey());
-        //     if (maxes.size() < numGetting) {
-        //         maxes.add(item);
-        //         numGotten++;
-        //     } else if (item.prob.weight() > maxes.peek().prob.weight()) {
-        //         maxes.poll();
-        //         maxes.add(item);
-        //     }
-        // }
-        // return new ArrayList(Arrays.asList(maxes.toArray(new ExtraItem[numGotten])));
     }
 
     ExtraItemTable(HashMap<String, HashMap<String, ExtraItem>> eiTable) {
